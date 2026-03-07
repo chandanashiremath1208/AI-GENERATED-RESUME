@@ -26,11 +26,29 @@ export default function ResumePreview({ content }: { content: string }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleDownload = () => {
-    // Generate a beautiful PDF using the browser's native print-to-pdf pipeline
-    setTimeout(() => {
-      window.print();
-    }, 100);
+  const handleDownload = async () => {
+    // Dynamically import to avoid SSR issues with window/document
+    const html2pdf = (await import('html2pdf.js')).default;
+    
+    const element = document.getElementById('resume-pdf-container');
+    if (!element) return;
+    
+    // Temporarily apply print styles for the PDF generation
+    element.classList.add('print:block', 'print:p-0', 'print:bg-white', 'print:border-none', 'print:shadow-none');
+    
+    const opt = {
+      margin:       [10, 10, 10, 10] as [number, number, number, number], // [top, left, bottom, right]
+      filename:     `Elevate_Resume_${parsedResume?.name?.replace(/\s+/g, '_') || 'Generated'}.pdf`,
+      image:        { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, letterRendering: true, windowWidth: 850 },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
+    };
+    
+    // Generate and download
+    await html2pdf().set(opt).from(element).save();
+    
+    // Remove print styles after generation
+    element.classList.remove('print:block', 'print:p-0', 'print:bg-white', 'print:border-none', 'print:shadow-none');
   };
 
   if (!content) return null;
@@ -57,7 +75,7 @@ export default function ResumePreview({ content }: { content: string }) {
 
       {/* Scrollable Paper Container */}
       <div className="flex-1 overflow-y-auto w-full flex justify-center p-8 bg-slate-50/80 scroll-smooth custom-scrollbar print:p-0 print:bg-white print:overflow-visible">
-        <div className="w-full max-w-[850px] bg-white h-max shadow-sm rounded border border-slate-100 p-12 sm:p-16 transition-all duration-300 print:shadow-none print:border-none print:p-0 print:max-w-none">
+        <div id="resume-pdf-container" className="w-full max-w-[850px] bg-white h-max shadow-sm rounded border border-slate-100 p-12 sm:p-16 transition-all duration-300 print:shadow-none print:border-none print:p-0 print:max-w-none">
           
           {isJson && parsedResume ? (
             <div className="text-slate-800 font-sans">
