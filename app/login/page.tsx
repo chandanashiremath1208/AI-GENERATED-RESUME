@@ -1,45 +1,46 @@
-import { createClient } from '@/utils/supabase/server'
-import { redirect } from 'next/navigation'
-import { Sparkles, Mail, Lock, ArrowRight } from 'lucide-react'
+'use client'
+
+import { createClient } from '@/utils/supabase/client'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Sparkles, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 
-export default async function LoginPage({
-  searchParams,
-}: {
-  searchParams: { message: string }
-}) {
-  const supabase = await createClient()
+export default function LoginPage() {
+  const router = useRouter()
+  const supabase = createClient()
   
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
-  if (user) {
-    return redirect('/dashboard')
-  }
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setErrorMsg('')
 
-  const signIn = async (formData: FormData) => {
-    'use server'
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-    const supabase = await createClient()
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
-
-    if (error) {
-      return redirect(`/login?message=${encodeURIComponent(error.message)}`)
+      if (error) {
+        setErrorMsg(error.message)
+      } else if (data.user) {
+        router.push('/dashboard')
+        router.refresh()
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'An unexpected error occurred')
+    } finally {
+      setIsLoading(false)
     }
-
-    return redirect('/dashboard')
   }
 
   return (
     <div className="min-h-screen w-full flex bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500/30 items-center justify-center p-4 relative overflow-hidden">
-      {/* Background elements */}
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-900/20 blur-[120px] rounded-full pointer-events-none"></div>
       <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-900/20 blur-[120px] rounded-full pointer-events-none"></div>
       
@@ -47,16 +48,14 @@ export default async function LoginPage({
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-indigo-500/10 blur-[60px] rounded-full pointer-events-none"></div>
 
         <div className="flex flex-col items-center mb-8 relative z-10">
-          <Link href="/">
-            <div className="w-12 h-12 mb-4 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20 cursor-pointer transform hover:rotate-3 transition-transform">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
-          </Link>
+          <div className="w-12 h-12 mb-4 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+            <Sparkles className="w-6 h-6 text-white" />
+          </div>
           <h1 className="text-2xl font-bold tracking-tight mb-2">Welcome Back</h1>
           <p className="text-slate-400 text-sm text-center">Sign in to access your resumes and generate new ones.</p>
         </div>
 
-        <form action={signIn} className="space-y-5 relative z-10">
+        <form onSubmit={handleSignIn} className="space-y-5 relative z-10">
           <div className="space-y-2">
             <label className="text-slate-300 font-medium text-sm flex items-center gap-2 mb-1.5" htmlFor="email">
               <Mail className="w-4 h-4 text-slate-400" /> Email
@@ -64,6 +63,8 @@ export default async function LoginPage({
             <input
               className="w-full h-12 bg-slate-950/50 border border-slate-800 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all outline-none"
               name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
             />
@@ -76,18 +77,24 @@ export default async function LoginPage({
               className="w-full h-12 bg-slate-950/50 border border-slate-800 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all outline-none"
               type="password"
               name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
             />
           </div>
           
-          <button className="w-full h-12 text-base font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-[0_0_20px_-5px_rgba(99,102,241,0.4)] transition-all transform hover:-translate-y-0.5 mt-2 flex items-center justify-center gap-2">
-            Sign In <ArrowRight className="w-4 h-4" />
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            className="w-full h-12 text-base font-bold rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white shadow-[0_0_20px_-5px_rgba(99,102,241,0.4)] transition-all transform hover:-translate-y-0.5 mt-2 flex items-center justify-center gap-2 disabled:opacity-70 disabled:hover:translate-y-0"
+          >
+            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <>Sign In <ArrowRight className="w-4 h-4" /></>}
           </button>
 
-          {searchParams?.message && (
+          {errorMsg && (
             <p className="mt-4 p-4 bg-red-950/50 border border-red-900 text-red-400 text-center text-sm rounded-xl">
-              {searchParams.message}
+              {errorMsg}
             </p>
           )}
 
