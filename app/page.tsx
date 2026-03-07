@@ -41,7 +41,7 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen w-full flex flex-col bg-slate-950 text-slate-100 font-sans overflow-hidden selection:bg-indigo-500/30 print:overflow-visible print:h-auto print:bg-white text-black">
+    <div className="h-screen w-full flex flex-col bg-slate-950 text-slate-100 font-sans overflow-hidden selection:bg-indigo-500/30 print:overflow-visible print:h-auto print:bg-white print:text-black">
       
       {/* Top Navigation Bar */}
       <nav className="h-16 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800 px-6 flex items-center justify-between shrink-0 z-20 relative print:hidden">
@@ -50,7 +50,7 @@ export default function Home() {
             <Sparkles className="w-4 h-4 text-white" />
           </div>
           <span className="font-bold text-xl tracking-tight text-slate-100">
-            AI Resume <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 font-extrabold">Studio</span>
+            Elevate <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 font-extrabold">AI</span>
           </span>
         </div>
         <div className="hidden sm:flex items-center gap-4 text-sm font-medium text-slate-400">

@@ -64,19 +64,19 @@ export default function ResumePreview({ content }: { content: string }) {
               
               {/* HEADER */}
               <div className="text-center mb-8">
-                <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-2">{parsedResume.name || 'Your Name'}</h1>
-                <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-500 mb-6">{parsedResume.role || 'Professional Title'}</h2>
+                <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-2">{parsedResume?.name || 'Your Name'}</h1>
+                <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-500 mb-6">{parsedResume?.role || 'Professional Title'}</h2>
                 
-                {parsedResume.contact && parsedResume.contact.length > 0 && (
+                {Array.isArray(parsedResume?.contact) && parsedResume.contact.length > 0 && (
                   <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 text-sm text-slate-600">
                     {parsedResume.contact.map((c: any, i: number) => (
                       <div key={i} className="flex items-center gap-2">
                         <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
-                          {c.type.toLowerCase().includes('mail') ? <Mail className="w-3.5 h-3.5 text-emerald-600" /> : 
-                           c.type.toLowerCase().includes('phone') ? <Phone className="w-3.5 h-3.5 text-emerald-600" /> : 
+                          {c?.type?.toLowerCase()?.includes('mail') ? <Mail className="w-3.5 h-3.5 text-emerald-600" /> : 
+                           c?.type?.toLowerCase()?.includes('phone') ? <Phone className="w-3.5 h-3.5 text-emerald-600" /> : 
                            <ExternalLink className="w-3.5 h-3.5 text-emerald-600" />}
                         </div>
-                        <span className="font-medium">{c.value}</span>
+                        <span className="font-medium">{c?.value || ''}</span>
                       </div>
                     ))}
                   </div>
@@ -84,7 +84,7 @@ export default function ResumePreview({ content }: { content: string }) {
               </div>
 
               {/* SUMMARY */}
-              {parsedResume.summary && (
+              {parsedResume?.summary && typeof parsedResume.summary === 'string' && (
                 <div className="mb-8">
                   <h3 className="text-xl font-bold text-slate-900 border-b-2 border-emerald-500 inline-block pb-1 mb-3">Summary</h3>
                   <div className="border-t border-slate-200 pt-3 mt-[-10px]">
@@ -94,7 +94,7 @@ export default function ResumePreview({ content }: { content: string }) {
               )}
 
               {/* EMPLOYMENT */}
-              {parsedResume.experience && parsedResume.experience.length > 0 && (
+              {Array.isArray(parsedResume?.experience) && parsedResume.experience.length > 0 && (
                 <div className="mb-8">
                    <h3 className="text-xl font-bold text-slate-900 border-b-2 border-emerald-500 inline-block pb-1 mb-3">Employment</h3>
                    <div className="border-t border-slate-200 pt-4 mt-[-10px] space-y-6">
@@ -102,11 +102,11 @@ export default function ResumePreview({ content }: { content: string }) {
                         <div key={i}>
                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline mb-2">
                             <h4 className="text-base font-bold text-slate-900">
-                              {exp.company} <span className="text-slate-400 font-normal mx-1">|</span> {exp.role} <span className="text-slate-400 font-normal mx-1">|</span> <span className="text-slate-600 font-medium">{exp.location}</span>
+                              {exp?.company || ''} <span className="text-slate-400 font-normal mx-1">|</span> {exp?.role || ''} <span className="text-slate-400 font-normal mx-1">|</span> <span className="text-slate-600 font-medium">{exp?.location || ''}</span>
                             </h4>
-                            <span className="text-sm font-semibold text-slate-500 whitespace-nowrap">{exp.date}</span>
+                            <span className="text-sm font-semibold text-slate-500 whitespace-nowrap">{exp?.date || ''}</span>
                           </div>
-                          {exp.bullets && exp.bullets.length > 0 && (
+                          {Array.isArray(exp?.bullets) && exp.bullets.length > 0 && (
                             <ul className="list-outside list-disc pl-5 space-y-1.5 text-sm text-slate-700 marker:text-slate-400">
                               {exp.bullets.map((bullet: string, j: number) => (
                                 <li key={j} className="leading-snug">{bullet}</li>
@@ -120,7 +120,7 @@ export default function ResumePreview({ content }: { content: string }) {
               )}
 
               {/* EDUCATION */}
-              {parsedResume.education && parsedResume.education.length > 0 && (
+              {Array.isArray(parsedResume?.education) && parsedResume.education.length > 0 && (
                 <div className="mb-8">
                    <h3 className="text-xl font-bold text-slate-900 border-b-2 border-emerald-500 inline-block pb-1 mb-3">Education</h3>
                    <div className="border-t border-slate-200 pt-4 mt-[-10px] space-y-4">
@@ -128,11 +128,11 @@ export default function ResumePreview({ content }: { content: string }) {
                         <div key={i}>
                           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline">
                             <h4 className="text-base font-bold text-slate-900">
-                              {edu.institution} <span className="text-slate-400 font-normal mx-1">|</span> {edu.degree}
+                              {edu?.institution || ''} <span className="text-slate-400 font-normal mx-1">|</span> {edu?.degree || ''}
                             </h4>
-                            <span className="text-sm font-semibold text-slate-500 whitespace-nowrap">{edu.date}</span>
+                            <span className="text-sm font-semibold text-slate-500 whitespace-nowrap">{edu?.date || ''}</span>
                           </div>
-                          {edu.details && edu.details.length > 0 && (
+                          {Array.isArray(edu?.details) && edu.details.length > 0 && (
                             <ul className="list-outside list-disc pl-5 mt-1.5 space-y-1 text-sm text-slate-700 marker:text-slate-400">
                               {edu.details.map((detail: string, j: number) => (
                                 <li key={j} className="leading-snug">{detail}</li>
@@ -146,7 +146,7 @@ export default function ResumePreview({ content }: { content: string }) {
               )}
 
               {/* SKILLS */}
-              {parsedResume.skills && parsedResume.skills.length > 0 && (
+              {Array.isArray(parsedResume?.skills) && parsedResume.skills.length > 0 && (
                 <div className="mb-6">
                    <h3 className="text-xl font-bold text-slate-900 border-b-2 border-emerald-500 inline-block pb-1 mb-3">Skills</h3>
                    <div className="border-t border-slate-200 pt-4 mt-[-10px]">
