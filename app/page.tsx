@@ -4,6 +4,7 @@ import ResumeForm from '@/components/ResumeForm';
 import ResumePreview from '@/components/ResumePreview';
 import { useState } from 'react';
 import { Sparkles, FileText, Briefcase, Zap } from 'lucide-react';
+import AuthButton from '@/components/AuthButton';
 
 export default function Home() {
   const [resumeContent, setResumeContent] = useState('');
@@ -52,12 +53,9 @@ export default function Home() {
             AI Resume <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 font-extrabold">Studio</span>
           </span>
         </div>
-        <div className="hidden sm:flex items-center gap-6 text-sm font-medium text-slate-400">
-          <span className="hover:text-slate-200 cursor-pointer transition-colors">Templates</span>
-          <span className="hover:text-slate-200 cursor-pointer transition-colors">My Resumes</span>
-          <button className="px-5 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg shadow-sm transition-all ml-2 backdrop-blur-sm">
-            Sign In
-          </button>
+        <div className="hidden sm:flex items-center gap-4 text-sm font-medium text-slate-400">
+          <span className="hover:text-slate-200 cursor-pointer transition-colors px-2">Templates</span>
+          <AuthButton />
         </div>
       </nav>
 

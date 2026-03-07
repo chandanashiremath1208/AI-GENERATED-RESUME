@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createSupabaseClient } from '@/utils/supabase';
+import { createClient } from '@/utils/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,12 +11,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Resume content is required' }, { status: 400 });
     }
 
-    const supabase = createSupabaseClient();
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Prepare insert payload (if user exists, tie it to their account)
+    const payload: any = { content: content };
+    if (user) {
+      payload.user_id = user.id;
+    }
+
     const { data, error } = await supabase
       .from('resumes')
-      .insert([
-        { content: content }
-      ])
+      .insert([payload])
       .select();
 
     if (error) {
