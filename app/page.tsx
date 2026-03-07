@@ -3,7 +3,7 @@
 import ResumeForm from '@/components/ResumeForm';
 import ResumePreview from '@/components/ResumePreview';
 import { useState } from 'react';
-import { Sparkles, FileText, Briefcase, Zap } from 'lucide-react';
+import { Sparkles, FileText, Briefcase, Zap, Layout, Edit3, Download } from 'lucide-react';
 import AuthButton from '@/components/AuthButton';
 
 export default function Home() {
@@ -54,7 +54,6 @@ export default function Home() {
           </span>
         </div>
         <div className="hidden sm:flex items-center gap-4 text-sm font-medium text-slate-400">
-          <span className="hover:text-slate-200 cursor-pointer transition-colors px-2">Templates</span>
           <AuthButton />
         </div>
       </nav>
@@ -77,9 +76,51 @@ export default function Home() {
               <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 mb-4 tracking-tight">
                 Resume Builder
               </h1>
-              <p className="text-slate-400 text-base sm:text-lg leading-relaxed max-w-lg">
+              <p className="text-slate-400 text-base sm:text-lg leading-relaxed max-w-lg mb-8">
                 Input your career history. Our AI will synthesize it into a world-class, ATS-optimized layout designed to get you hired.
               </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 mb-4 w-full max-w-3xl mx-auto sm:mx-0">
+                <div className="bg-slate-900/60 border border-slate-800/80 p-5 rounded-2xl flex flex-col items-center text-center hover:bg-slate-800/80 transition-colors shadow-sm">
+                  <div className="w-10 h-10 rounded-full bg-slate-950 flex items-center justify-center mb-3 text-slate-300 ring-1 ring-white/5 shadow-inner">
+                    <Sparkles className="w-4 h-4" />
+                  </div>
+                  <h3 className="font-semibold text-slate-200 text-sm mb-1.5">AI Resume Generation</h3>
+                  <p className="text-slate-500 text-xs leading-relaxed">Content generated automatically using AI.</p>
+                </div>
+                
+                <div className="bg-slate-900/60 border border-slate-800/80 p-5 rounded-2xl flex flex-col items-center text-center hover:bg-slate-800/80 transition-colors shadow-sm">
+                  <div className="w-10 h-10 rounded-full bg-slate-950 flex items-center justify-center mb-3 text-slate-300 ring-1 ring-white/5 shadow-inner">
+                    <Layout className="w-4 h-4" />
+                  </div>
+                  <h3 className="font-semibold text-slate-200 text-sm mb-1.5">Multiple Templates</h3>
+                  <p className="text-slate-500 text-xs leading-relaxed">Professionally designed templates.</p>
+                </div>
+
+                <div className="bg-slate-900/60 border border-slate-800/80 p-5 rounded-2xl flex flex-col items-center text-center hover:bg-slate-800/80 transition-colors shadow-sm">
+                  <div className="w-10 h-10 rounded-full bg-slate-950 flex items-center justify-center mb-3 text-slate-300 ring-1 ring-white/5 shadow-inner">
+                    <Edit3 className="w-4 h-4" />
+                  </div>
+                  <h3 className="font-semibold text-slate-200 text-sm mb-1.5">Live Resume Editor</h3>
+                  <p className="text-slate-500 text-xs leading-relaxed">Edit your resume and see changes instantly.</p>
+                </div>
+
+                <div className="bg-slate-900/60 border border-slate-800/80 p-5 rounded-2xl flex flex-col items-center text-center hover:bg-slate-800/80 transition-colors shadow-sm">
+                  <div className="w-10 h-10 rounded-full bg-slate-950 flex items-center justify-center mb-3 text-slate-300 ring-1 ring-white/5 shadow-inner">
+                    <Download className="w-4 h-4" />
+                  </div>
+                  <h3 className="font-semibold text-slate-200 text-sm mb-1.5">PDF Download</h3>
+                  <p className="text-slate-500 text-xs leading-relaxed">Export your resume as a pristine PDF.</p>
+                </div>
+
+                <div className="bg-slate-900/60 border border-slate-800/80 p-5 rounded-2xl flex flex-col items-center text-center hover:bg-slate-800/80 transition-colors shadow-sm">
+                  <div className="w-10 h-10 rounded-full bg-slate-950 flex items-center justify-center mb-3 text-slate-300 ring-1 ring-white/5 shadow-inner">
+                    <Zap className="w-4 h-4" />
+                  </div>
+                  <h3 className="font-semibold text-slate-200 text-sm mb-1.5">Smart AI Suggestions</h3>
+                  <p className="text-slate-500 text-xs leading-relaxed">Improves descriptions and bullet points.</p>
+                </div>
+              </div>
             </div>
             
             <ResumeForm onSubmit={handleGenerate} isLoading={isLoading} />
