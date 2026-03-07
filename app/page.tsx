@@ -41,10 +41,10 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen w-full flex flex-col bg-slate-950 text-slate-100 font-sans overflow-hidden selection:bg-indigo-500/30">
+    <div className="h-screen w-full flex flex-col bg-slate-950 text-slate-100 font-sans overflow-hidden selection:bg-indigo-500/30 print:overflow-visible print:h-auto print:bg-white text-black">
       
       {/* Top Navigation Bar */}
-      <nav className="h-16 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800 px-6 flex items-center justify-between shrink-0 z-20 relative">
+      <nav className="h-16 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800 px-6 flex items-center justify-between shrink-0 z-20 relative print:hidden">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
             <Sparkles className="w-4 h-4 text-white" />
@@ -66,7 +66,7 @@ export default function Home() {
         <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-900/20 blur-[120px] rounded-full pointer-events-none"></div>
 
         {/* LEFT PANEL: Form Editor (Scrollable) */}
-        <div className="w-full lg:w-[45%] h-full overflow-y-auto custom-scrollbar flex flex-col border-r border-slate-800 bg-slate-950/50 backdrop-blur-xl z-10 relative shadow-[4px_0_24px_rgba(0,0,0,0.2)]">
+        <div className="w-full lg:w-[45%] h-full overflow-y-auto custom-scrollbar flex flex-col border-r border-slate-800 bg-slate-950/50 backdrop-blur-xl z-10 relative shadow-[4px_0_24px_rgba(0,0,0,0.2)] print:hidden">
           
           <div className="px-8 sm:px-12 py-10 max-w-2xl mx-auto w-full relative z-10">
             <div className="mb-10 text-center sm:text-left">
@@ -128,13 +128,13 @@ export default function Home() {
         </div>
 
         {/* RIGHT PANEL: Live Preview (Fixed) */}
-        <div className="hidden lg:flex flex-1 h-full bg-slate-900 relative flex-col items-center justify-center p-8 z-0">
+        <div className="hidden lg:flex flex-1 h-full bg-slate-900 relative flex-col items-center justify-center p-8 z-0 print:flex print:absolute print:inset-0 print:p-0 print:bg-white print:z-50 print:block">
           {/* Subtle grid background for the canvas area */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:32px_32px]"></div>
           
           {resumeContent ? (
-            <div className="w-full h-full max-w-5xl flex flex-col items-center justify-start rounded-2xl overflow-hidden shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] ring-1 ring-white/10 bg-slate-800/50 p-3 z-10 transition-all duration-500 fade-in zoom-in-95 backdrop-blur-md">
-               <div className="w-full h-full bg-white rounded-xl shadow-inner overflow-hidden border border-slate-200 relative">
+            <div className="w-full h-full max-w-5xl flex flex-col items-center justify-start rounded-2xl overflow-hidden shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] ring-1 ring-white/10 bg-slate-800/50 p-3 z-10 transition-all duration-500 fade-in zoom-in-95 backdrop-blur-md print:shadow-none print:ring-0 print:bg-transparent print:p-0 print:block">
+               <div className="w-full h-full bg-white rounded-xl shadow-inner overflow-hidden border border-slate-200 relative print:border-none print:shadow-none print:rounded-none">
                 <ResumePreview content={resumeContent} />
                </div>
             </div>

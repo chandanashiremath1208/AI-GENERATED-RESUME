@@ -30,7 +30,7 @@ export default async function DashboardPage() {
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <span className="font-bold text-xl tracking-tight text-slate-100">
-                AI Resume <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 font-extrabold">Studio</span>
+                Elevate <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 font-extrabold">AI</span>
               </span>
             </div>
           </Link>

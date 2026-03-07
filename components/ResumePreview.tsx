@@ -27,20 +27,18 @@ export default function ResumePreview({ content }: { content: string }) {
   };
 
   const handleDownload = () => {
-    const element = document.createElement("a");
-    const file = new Blob([content], { type: 'text/markdown' });
-    element.href = URL.createObjectURL(file);
-    element.download = "my_resume.md";
-    document.body.appendChild(element);
-    element.click();
+    // Generate a beautiful PDF using the browser's native print-to-pdf pipeline
+    setTimeout(() => {
+      window.print();
+    }, 100);
   };
 
   if (!content) return null;
 
   return (
-    <div className="w-full h-full flex flex-col relative bg-transparent overflow-hidden">
+    <div className="w-full h-full flex flex-col relative bg-transparent overflow-hidden print:overflow-visible">
       {/* Top Banner Toolbar */}
-      <div className="w-full bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
+      <div className="w-full bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10 print:hidden">
         <div className="text-sm font-bold text-slate-800 flex items-center gap-2">
           <FileText className="w-4 h-4 text-indigo-500" />
           Generated AI Resume
@@ -52,14 +50,14 @@ export default function ResumePreview({ content }: { content: string }) {
           </Button>
           <Button size="sm" onClick={handleDownload} className="h-9 px-4 gap-2 text-sm font-medium rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 transition-all duration-300 transform hover:-translate-y-0.5">
             <Download className="w-4 h-4" />
-            Download Data
+            Download PDF
           </Button>
         </div>
       </div>
 
       {/* Scrollable Paper Container */}
-      <div className="flex-1 overflow-y-auto w-full flex justify-center p-8 bg-slate-50/80 scroll-smooth custom-scrollbar">
-        <div className="w-full max-w-[850px] bg-white h-max shadow-sm rounded border border-slate-100 p-12 sm:p-16 transition-all duration-300">
+      <div className="flex-1 overflow-y-auto w-full flex justify-center p-8 bg-slate-50/80 scroll-smooth custom-scrollbar print:p-0 print:bg-white print:overflow-visible">
+        <div className="w-full max-w-[850px] bg-white h-max shadow-sm rounded border border-slate-100 p-12 sm:p-16 transition-all duration-300 print:shadow-none print:border-none print:p-0 print:max-w-none">
           
           {isJson && parsedResume ? (
             <div className="text-slate-800 font-sans">
