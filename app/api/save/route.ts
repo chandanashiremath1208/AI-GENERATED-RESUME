@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/utils/supabase';
+import { createSupabaseClient } from '@/utils/supabase';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
@@ -9,6 +11,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Resume content is required' }, { status: 400 });
     }
 
+    const supabase = createSupabaseClient();
     const { data, error } = await supabase
       .from('resumes')
       .insert([
