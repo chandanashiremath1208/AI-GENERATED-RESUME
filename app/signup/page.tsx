@@ -31,7 +31,7 @@ export default async function SignUpPage({
     })
 
     if (error) {
-      return redirect('/signup?message=Could not authenticate user')
+      return redirect(`/signup?message=${encodeURIComponent(error.message)}`)
     }
 
     return redirect('/signup?message=Check email to continue sign in process')
