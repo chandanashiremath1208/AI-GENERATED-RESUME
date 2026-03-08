@@ -175,11 +175,16 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {[
               { title: "The Modern Engineer", desc: "Dark-mode optimized, heavy focus on technical syntax and hard skills.", img: "/examples/tech.png" },
               { title: "The Creative Director", desc: "Vibrant accent columns emphasizing portfolio links and visual hierarchy.", img: "/examples/creative.png" },
-              { title: "The Chief Executive", desc: "Classic, authoritative serif typography maximizing leadership impact.", img: "/examples/executive.png" }
+              { title: "The Chief Executive", desc: "Classic, authoritative serif typography maximizing leadership impact.", img: "/examples/executive.png" },
+              { title: "The Academic Researcher", desc: "Minimalist layout prioritizing publications, research background, and grants.", img: "/examples/academic.png" },
+              { title: "The Startup Founder", desc: "Energetic and bold design with skill infographics and dynamic accents.", img: "/examples/startup.png" },
+              { title: "The Medical Professional", desc: "Clinical, structured, and traditional formatting emphasizing clinical experience.", img: "/examples/medical.png" },
+              { title: "The Finance Analyst", desc: "Highly structured, dense metrics-focused design aimed at ROI and analytics.", img: "/examples/finance.png" },
+              { title: "The Entry-Level Intern", desc: "Clean and accessible entry-level format, focusing on extracurriculars.", img: "/examples/student.png" }
             ].map((example, i) => (
               <div key={i} className="group relative rounded-2xl bg-slate-900/40 border border-slate-800/60 overflow-hidden cursor-crosshair shadow-lg hover:shadow-indigo-500/10 transition-all duration-500">
                 <div className="aspect-[1/1.414] w-full overflow-hidden relative bg-slate-950">
