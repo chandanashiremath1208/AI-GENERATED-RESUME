@@ -157,6 +157,48 @@ export default function Home() {
           )}
         </div>
       </main>
+
+      {/* REFERENCE EXAMPLES SECTION */}
+      <section className="w-full bg-slate-950 border-t border-slate-800/60 py-24 relative overflow-hidden z-10 print:hidden shrink-0">
+        
+        {/* Background Accents */}
+        <div className="absolute top-0 right-0 w-[800px] h-[400px] bg-indigo-900/10 blur-[150px] rounded-full pointer-events-none transform -translate-y-1/2 translate-x-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-[600px] h-[300px] bg-purple-900/10 blur-[120px] rounded-full pointer-events-none transform translate-y-1/2 -translate-x-1/4"></div>
+
+        <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 tracking-tight">
+              Ignite Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Inspiration</span>
+            </h2>
+            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+              Our AI doesn't just write your resume; it crafts a narrative. Explore these reference formats generated entirely by Elevate AI to see what's possible.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
+            {[
+              { title: "The Modern Engineer", desc: "Dark-mode optimized, heavy focus on technical syntax and hard skills.", img: "/examples/tech.png" },
+              { title: "The Creative Director", desc: "Vibrant accent columns emphasizing portfolio links and visual hierarchy.", img: "/examples/creative.png" },
+              { title: "The Chief Executive", desc: "Classic, authoritative serif typography maximizing leadership impact.", img: "/examples/executive.png" }
+            ].map((example, i) => (
+              <div key={i} className="group relative rounded-2xl bg-slate-900/40 border border-slate-800/60 overflow-hidden cursor-crosshair shadow-lg hover:shadow-indigo-500/10 transition-all duration-500">
+                <div className="aspect-[1/1.414] w-full overflow-hidden relative bg-slate-950">
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent z-10 opacity-80 group-hover:opacity-60 transition-opacity"></div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={example.img} alt={example.title} className="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-700 ease-out saturate-50 group-hover:saturate-100" />
+                  
+                  <div className="absolute bottom-0 left-0 w-full p-6 sm:p-8 z-20 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                    <h3 className="text-xl font-bold text-white mb-2 tracking-tight drop-shadow-md">{example.title}</h3>
+                    <p className="text-sm text-slate-300 font-medium leading-relaxed drop-shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">{example.desc}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+        </div>
+      </section>
+
     </div>
   );
 }
