@@ -41,7 +41,7 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen w-full flex flex-col bg-slate-950 text-slate-100 font-sans overflow-hidden selection:bg-indigo-500/30 print:overflow-visible print:h-auto print:bg-white print:text-black">
+    <div className="min-h-screen w-full flex flex-col bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500/30 print:min-h-0 print:h-auto print:bg-white print:text-black">
       
       {/* Top Navigation Bar */}
       <nav className="h-16 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800 px-6 flex items-center justify-between shrink-0 z-20 relative print:hidden">
@@ -59,7 +59,7 @@ export default function Home() {
       </nav>
 
       {/* Main Split Layout */}
-      <main className="flex-1 w-full flex overflow-hidden relative">
+      <main className="h-[calc(100vh-4rem)] min-h-[600px] w-full flex overflow-hidden relative shrink-0">
         
         {/* Ambient Dark Background Glows */}
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-900/20 blur-[120px] rounded-full pointer-events-none"></div>
