@@ -1,6 +1,6 @@
 'use client';
 
-import ResumeForm from '@/components/ResumeForm';
+import WizardForm from '@/components/WizardForm';
 import ResumePreview from '@/components/ResumePreview';
 import { useState, useEffect, Suspense } from 'react';
 import { Sparkles, FileText, Briefcase, Zap, Layout, Edit3, Download } from 'lucide-react';
@@ -135,7 +135,7 @@ function ResumeBuilderContent() {
               </div>
             </div>
             
-            <ResumeForm onSubmit={handleGenerate} isLoading={isLoading} initialData={initialData} />
+            <WizardForm onSubmit={handleGenerate} isLoading={isLoading} initialData={initialData} />
           </div>
         </div>
 
