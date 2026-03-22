@@ -140,9 +140,20 @@ export default function ResumeWizard({ onSubmit, isLoading, initialData }: { onS
                 { id: 'startup', name: 'Startup Bold', desc: 'High-energy tech vibe.' },
                 { id: 'academic', name: 'Academic Slate', desc: 'Formal and structured.' }
               ].map((t) => (
-                <div key={t.id} onClick={() => setTemplate(t.id)} className={`cursor-pointer p-4 rounded-xl border-2 transition-all ${formData.template === t.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-slate-800 bg-slate-900/40 hover:border-slate-700'}`}>
-                  <h4 className="font-bold text-slate-100 text-xs mb-1 uppercase">{t.name}</h4>
-                  <p className="text-[10px] text-slate-500 leading-tight">{t.desc}</p>
+                <div key={t.id} onClick={() => setTemplate(t.id)} className={`cursor-pointer overflow-hidden border-2 transition-all rounded-2xl ${formData.template === t.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-slate-800 bg-slate-900/40 hover:border-slate-700'}`}>
+                  <div className="aspect-video w-full relative group">
+                    <img 
+                      src={`/samples/${t.id === 'minimal' ? 'modern' : t.id}.png`} 
+                      alt={t.name}
+                      className={`w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity ${formData.template === t.id ? 'opacity-100' : ''}`}
+                    />
+                    <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-slate-950 to-transparent">
+                      <h4 className="font-bold text-white text-[10px] uppercase truncate">{t.name}</h4>
+                    </div>
+                  </div>
+                  <div className="p-3">
+                    <p className="text-[10px] text-slate-500 leading-tight italic">{t.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>

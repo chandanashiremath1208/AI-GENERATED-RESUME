@@ -18,7 +18,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized. Please sign in.' }, { status: 401 });
     }
 
-    const { data, error } = await supabase
+    // Attempt full insert first
+    let { data, error } = await supabase
       .from('resumes')
       .insert([{ 
         content: content,
@@ -28,9 +29,24 @@ export async function POST(req: Request) {
       }])
       .select();
 
+    // Fallback for legacy tables without title/template columns
     if (error) {
-      console.error('Supabase Error:', error);
-      return NextResponse.json({ error: 'Failed to save to database' }, { status: 500 });
+      console.warn('Full insert failed, attempting legacy insert:', error.message);
+      const fallback = await supabase
+        .from('resumes')
+        .insert([{ 
+          content: content,
+          user_id: user.id 
+        }])
+        .select();
+      
+      data = fallback.data;
+      error = fallback.error;
+    }
+
+    if (error) {
+      console.error('Final Supabase Error:', error);
+      return NextResponse.json({ error: 'Critical: Failed to save to database. Check table schema.' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, data });
