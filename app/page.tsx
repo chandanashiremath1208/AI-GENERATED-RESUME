@@ -1,12 +1,165 @@
 'use client';
 
-import WizardForm from '@/components/WizardForm';
-import ResumePreview from '@/components/ResumePreview';
 import { useState, useEffect, Suspense } from 'react';
-import { Sparkles, FileText, Briefcase, Zap, Layout, Edit3, Download } from 'lucide-react';
-import AuthButton from '@/components/AuthButton';
 import { useSearchParams } from 'next/navigation';
+import { 
+  Sparkles, FileText, Briefcase, Zap, Layout, 
+  Download, Loader2, User, Mail, Phone, 
+  GraduationCap, Wrench, ArrowRight 
+} from 'lucide-react';
 
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import ResumePreview from '@/components/ResumePreview';
+import AuthButton from '@/components/AuthButton';
+
+// --- INLINED WIZARD FORM COMPONENT ---
+function WizardForm({ onSubmit, isLoading, initialData }: { onSubmit: (data: any) => void, isLoading: boolean, initialData?: any }) {
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    role: '',
+    summary: '',
+    experience: '',
+    education: '',
+    skills: '',
+    template: 'modern'
+  });
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData(prev => ({ ...prev, ...initialData }));
+    }
+  }, [initialData]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const setTemplate = (t: string) => setFormData({ ...formData, template: t });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (step < 4) {
+      setStep(step + 1);
+    } else {
+      onSubmit(formData);
+    }
+  };
+
+  const nextStep = () => setStep(s => Math.min(s + 1, 4));
+  const prevStep = () => setStep(s => Math.max(s - 1, 1));
+
+  const inputClasses = "h-11 bg-slate-900/50 border-slate-700/50 text-slate-100 placeholder:text-slate-500 rounded-xl focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all shadow-inner";
+  const labelClasses = "text-slate-300 font-medium text-sm flex items-center gap-2 mb-1.5";
+  const cardClasses = "bg-slate-800/40 border border-slate-700/50 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl relative overflow-hidden group hover:border-slate-600/50 transition-colors h-full min-h-[400px]";
+
+  return (
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 mt-2">
+      <div className="flex items-center justify-between px-2 mb-8">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="flex items-center flex-1 last:flex-none">
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-500 ${step >= i ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)]' : 'bg-slate-800 text-slate-500 border border-slate-700'}`}>
+              {i}
+            </div>
+            {i < 4 && <div className={`h-0.5 flex-1 mx-2 rounded-full transition-all duration-700 ${step > i ? 'bg-indigo-600' : 'bg-slate-800'}`}></div>}
+          </div>
+        ))}
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6 min-h-[450px]">
+        {step === 1 && (
+          <div className={`${cardClasses} animate-in fade-in duration-500`}>
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-indigo-600"></div>
+            <h3 className="flex items-center gap-2 text-xl font-bold text-slate-100 mb-6 tracking-tight uppercase">
+              <User className="w-5 h-5 text-indigo-400" /> Identity Profile
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+              <div>
+                <Label htmlFor="name" className={labelClasses}>Full Name</Label>
+                <Input id="name" name="name" required value={formData.name} onChange={handleChange} placeholder="e.g. John Doe" className={inputClasses} />
+              </div>
+              <div>
+                <Label htmlFor="role" className={labelClasses}>Target Role</Label>
+                <Input id="role" name="role" required value={formData.role} onChange={handleChange} placeholder="e.g. Senior Software Engineer" className={inputClasses} />
+              </div>
+              <div>
+                <Label htmlFor="email" className={labelClasses}><Mail className="w-3.5 h-3.5 text-slate-400"/> Email</Label>
+                <Input id="email" name="email" type="email" required value={formData.email} onChange={handleChange} className={inputClasses} />
+              </div>
+              <div>
+                <Label htmlFor="phone" className={labelClasses}><Phone className="w-3.5 h-3.5 text-slate-400"/> Phone</Label>
+                <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} className={inputClasses} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className={`${cardClasses} animate-in fade-in duration-500`}>
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-purple-600"></div>
+            <h3 className="flex items-center gap-2 text-xl font-bold text-slate-100 mb-4 tracking-tight uppercase">
+              <Briefcase className="w-5 h-5 text-purple-400" /> Work History
+            </h3>
+            <p className="text-xs text-slate-400 mb-4 italic">The AI will transform your rough notes into professional impact statements.</p>
+            <Textarea id="experience" name="experience" required value={formData.experience} onChange={handleChange} rows={10} className={`${inputClasses} h-auto resize-none py-3 leading-relaxed`} />
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className={`${cardClasses} animate-in fade-in duration-500`}>
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500 to-emerald-600"></div>
+            <h3 className="flex items-center gap-2 text-xl font-bold text-slate-100 mb-5 tracking-tight uppercase">
+              <GraduationCap className="w-5 h-5 text-emerald-400" /> Education & Talent
+            </h3>
+            <div className="space-y-6">
+              <div>
+                <Label htmlFor="education" className={labelClasses}>Academic Background</Label>
+                <Textarea id="education" name="education" value={formData.education} onChange={handleChange} rows={3} className={`${inputClasses} h-auto resize-none py-3`} />
+              </div>
+              <div>
+                <Label htmlFor="skills" className={labelClasses}><Wrench className="w-4 h-4 text-emerald-400"/> Technical Stack</Label>
+                <Input id="skills" name="skills" required value={formData.skills} onChange={handleChange} className={inputClasses} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className={`${cardClasses} animate-in fade-in duration-500`}>
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-500 to-amber-600"></div>
+            <h3 className="flex items-center gap-2 text-xl font-bold text-slate-100 mb-6 tracking-tight uppercase">
+              <Sparkles className="w-5 h-5 text-amber-400" /> Style Selection
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {['modern', 'executive', 'creative'].map((t) => (
+                <div key={t} onClick={() => setTemplate(t)} className={`cursor-pointer p-4 rounded-xl border-2 transition-all ${formData.template === t ? 'border-indigo-500 bg-indigo-500/10' : 'border-slate-800 bg-slate-900/40'}`}>
+                  <h4 className="font-bold text-slate-100 text-sm mb-1 uppercase tracking-tighter">{t}</h4>
+                </div>
+              ))}
+            </div>
+            <div className="mt-8 p-4 bg-indigo-500/5 border border-indigo-500/20 rounded-xl text-center">
+              <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest">AI Engine: Optimized for {formData.template} aesthetic</p>
+            </div>
+          </div>
+        )}
+
+        <div className="flex gap-4 pt-4">
+          {step > 1 && <Button type="button" onClick={prevStep} className="flex-1 h-12 bg-slate-900 border border-slate-700 text-slate-300 font-bold">Back</Button>}
+          <Button type="submit" disabled={isLoading} className={`h-12 text-base font-bold rounded-xl flex-1 transition-all ${step === 4 ? 'bg-indigo-600 hover:bg-indigo-500 text-white' : 'bg-white/5 hover:bg-white/10 text-white'}`}>
+            {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : (step === 4 ? 'Generate Resume' : 'Continue')}
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+// --- MAIN PAGE COMPONENT ---
 function ResumeBuilderContent() {
   const [resumeContent, setResumeContent] = useState('');
   const [template, setTemplate] = useState('modern');
@@ -45,9 +198,7 @@ function ResumeBuilderContent() {
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to generate resume');
-      }
+      if (!response.ok) throw new Error('Failed to generate resume');
 
       const data = await response.json();
       setResumeContent(data.resume);
@@ -56,143 +207,71 @@ function ResumeBuilderContent() {
       await fetch('/api/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          content: data.resume,
-          template: formData.template
-        }),
+        body: JSON.stringify({ content: data.resume, template: formData.template }),
       });
-
     } catch (error) {
       console.error('Error generating resume:', error);
-      alert('There was an error generating your resume. Please try again.');
+      alert('Generation error. Please retry.');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500/30 print:min-h-0 print:h-auto print:bg-white print:text-black">
-      
-      {/* Top Navigation Bar */}
-      <nav className="h-16 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800 px-6 flex items-center justify-between shrink-0 z-20 relative print:hidden">
+    <div className="min-h-screen w-full flex flex-col bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500/30 print:bg-white print:text-black">
+      <nav className="h-16 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800 px-6 flex items-center justify-between z-20 print:hidden sticky top-0">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
             <Sparkles className="w-4 h-4 text-white" />
           </div>
-          <span className="font-bold text-xl tracking-tight text-slate-100">
-            Elevate <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 font-extrabold">AI</span>
-          </span>
+          <span className="font-bold text-xl tracking-tight text-slate-100 uppercase">Elevate <span className="text-indigo-400">AI</span></span>
         </div>
-        <div className="hidden sm:flex items-center gap-4 text-sm font-medium text-slate-400">
+        <div className="flex items-center gap-4 text-sm font-medium text-slate-400">
           <AuthButton />
         </div>
       </nav>
 
-      {/* Main Split Layout */}
-      <main className="h-[calc(100vh-4rem)] min-h-[600px] w-full flex overflow-hidden relative shrink-0">
-        
-        {/* Ambient Dark Background Glows */}
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-900/20 blur-[120px] rounded-full pointer-events-none"></div>
-        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-900/20 blur-[120px] rounded-full pointer-events-none"></div>
-
-        {/* LEFT PANEL: Form Editor (Scrollable) */}
-        <div className="w-full lg:w-[45%] h-full overflow-y-auto custom-scrollbar flex flex-col border-r border-slate-800 bg-slate-950/50 backdrop-blur-xl z-10 relative shadow-[4px_0_24px_rgba(0,0,0,0.2)] print:hidden">
-          
-          <div className="px-8 sm:px-12 py-10 max-w-2xl mx-auto w-full relative z-10">
-            <div className="mb-10 text-center sm:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider mb-4">
-                <Zap className="w-3.5 h-3.5" /> AI-Powered
+      <main className="flex-1 w-full flex flex-col lg:flex-row overflow-hidden relative">
+        <div className="w-full lg:w-[45%] h-full overflow-y-auto px-6 sm:px-12 py-10 z-10 bg-slate-950 border-r border-slate-800 print:hidden">
+          <div className="max-w-xl mx-auto">
+            <div className="mb-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest mb-4">
+                <Zap className="w-3.5 h-3.5" /> High Performance
               </div>
-              <h1 className="text-4xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 mb-4 tracking-tight">
-                Resume Builder
-              </h1>
-              <p className="text-slate-400 text-base sm:text-lg leading-relaxed max-w-lg mb-8 text-balance">
-                {resumeId ? "You are currently editing a saved resume. Make changes below to regenerate." : "Input your career history. Our AI will synthesize it into a world-class, ATS-optimized layout designed to get you hired."}
-              </p>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 mb-4 w-full max-w-3xl mx-auto sm:mx-0">
-                <div className="bg-slate-900/60 border border-slate-800/80 p-5 rounded-2xl flex flex-col items-center text-center hover:bg-slate-800/80 transition-colors shadow-sm">
-                  <div className="w-10 h-10 rounded-full bg-slate-950 flex items-center justify-center mb-3 text-slate-300 ring-1 ring-white/5 shadow-inner">
-                    <Sparkles className="w-4 h-4" />
-                  </div>
-                  <h3 className="font-semibold text-slate-200 text-sm mb-1.5 leading-none">AI Resume Generation</h3>
-                  <p className="text-slate-500 text-[10px] leading-relaxed">Content generated automatically using AI.</p>
-                </div>
-                <div className="bg-slate-900/60 border border-slate-800/80 p-5 rounded-2xl flex flex-col items-center text-center hover:bg-slate-800/80 transition-colors shadow-sm">
-                  <div className="w-10 h-10 rounded-full bg-slate-950 flex items-center justify-center mb-3 text-slate-300 ring-1 ring-white/5 shadow-inner">
-                    <Layout className="w-4 h-4" />
-                  </div>
-                  <h3 className="font-semibold text-slate-200 text-sm mb-1.5 leading-none">Multiple Templates</h3>
-                  <p className="text-slate-500 text-[10px] leading-relaxed">Professionally designed templates.</p>
-                </div>
-                <div className="bg-slate-900/60 border border-slate-800/80 p-5 rounded-2xl flex flex-col items-center text-center hover:bg-slate-800/80 transition-colors shadow-sm">
-                  <div className="w-10 h-10 rounded-full bg-slate-950 flex items-center justify-center mb-3 text-slate-300 ring-1 ring-white/5 shadow-inner">
-                    <Download className="w-4 h-4" />
-                  </div>
-                  <h3 className="font-semibold text-slate-200 text-sm mb-1.5 leading-none">PDF Download</h3>
-                  <p className="text-slate-500 text-[10px] leading-relaxed">Export your resume as a pristine PDF.</p>
-                </div>
-              </div>
+              <h1 className="text-4xl sm:text-5xl font-black text-white mb-4 tracking-tighter uppercase leading-none">Intelligence OS</h1>
+              <p className="text-slate-500 text-sm leading-relaxed mb-8">Deploy your career history into a world-class, ATS-hardened profile instantly.</p>
             </div>
-            
             <WizardForm onSubmit={handleGenerate} isLoading={isLoading} initialData={initialData} />
           </div>
         </div>
 
-        {/* RIGHT PANEL: Live Preview (Fixed) */}
-        <div className="hidden lg:flex flex-1 h-full bg-slate-900 relative flex-col items-center justify-center p-8 z-0 print:flex print:absolute print:inset-0 print:p-0 print:bg-white print:z-50 print:block">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:32px_32px]"></div>
-          
+        <div className="flex-1 h-full bg-slate-900 flex flex-col items-center justify-center p-8 z-0 print:flex print:p-0">
           {resumeContent ? (
-            <div className="w-full h-full max-w-5xl flex flex-col items-center justify-start rounded-2xl overflow-hidden shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] ring-1 ring-white/10 bg-slate-800/50 p-3 z-10 transition-all duration-500 fade-in zoom-in-95 backdrop-blur-md print:shadow-none print:ring-0 print:bg-transparent print:p-0 print:block">
-               <div className="w-full h-full bg-white rounded-xl shadow-inner overflow-hidden border border-slate-200 relative print:border-none print:shadow-none print:rounded-none">
-                <ResumePreview content={resumeContent} template={template} />
-               </div>
+            <div className="w-full h-full max-w-5xl bg-white rounded-2xl overflow-hidden shadow-2xl print:shadow-none print:rounded-none">
+              <ResumePreview content={resumeContent} template={template} />
             </div>
           ) : (
-            <div className="relative w-full max-w-2xl bg-slate-800/40 backdrop-blur-xl shadow-2xl shadow-black/50 rounded-3xl border border-white/5 flex flex-col items-center justify-center p-16 text-center z-10 overflow-hidden">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-1/2 bg-indigo-500/10 blur-[60px] rounded-full pointer-events-none"></div>
-              <div className="w-24 h-24 mb-8 relative">
-                <div className="absolute inset-0 bg-indigo-500/30 rounded-full blur-xl animate-pulse" />
-                <div className="relative bg-gradient-to-br from-slate-700 to-slate-800 w-full h-full rounded-2xl shadow-xl flex flex-col items-center justify-center border border-slate-600/50 text-indigo-400 transform rotate-3 hover:rotate-6 hover:-translate-y-1 transition-all">
-                   <FileText className="w-10 h-10 mb-1 drop-shadow-md" />
-                </div>
+            <div className="text-center">
+              <div className="w-20 h-20 mx-auto mb-6 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-500 animate-pulse">
+                <FileText className="w-10 h-10" />
               </div>
-              <h3 className="text-3xl font-extrabold mb-4 text-white tracking-tight">Your Canvas Awaits</h3>
-              <p className="text-lg text-slate-400 max-w-md font-medium leading-relaxed">
-                Start filling out your details on the left. Once ready, hit generate to see your pixel-perfect resume appear here instantly.
-              </p>
+              <h3 className="text-2xl font-bold text-white mb-2 uppercase">Systems Standby</h3>
+              <p className="text-slate-500 text-sm max-w-xs mx-auto">Awaiting data input to synthesize your professional profile.</p>
             </div>
           )}
         </div>
       </main>
 
-      {/* REFERENCE EXAMPLES SECTION */}
-      <section className="w-full bg-slate-950 border-t border-slate-800/60 py-24 relative overflow-hidden z-10 print:hidden shrink-0">
-        <div className="max-w-7xl mx-auto px-6 sm:px-12 relative z-10">
+      <section className="w-full bg-slate-950 border-t border-slate-800/60 py-24 z-10 print:hidden">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 tracking-tight">
-              Ignite Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">Inspiration</span>
-            </h2>
-            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-              Explore these reference formats generated entirely by Elevate AI to see what's possible.
-            </p>
+            <h2 className="text-3xl font-black text-white mb-4 uppercase tracking-tighter">Inspiration Matrix</h2>
+            <p className="text-slate-500 text-sm">Visual reference formats generated by the Elevate AI Core.</p>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-            {[
-              { title: "The Modern Engineer", desc: "Dark-mode optimized, heavy focus on technical syntax.", img: "/examples/tech.png" },
-              { title: "The Creative Director", desc: "Vibrant accent columns emphasizing visual hierarchy.", img: "/examples/creative.png" },
-              { title: "The Chief Executive", desc: "Classic, authoritative serif typography.", img: "/examples/executive.png" },
-              { title: "The Academic Researcher", desc: "Minimalist layout prioritizing research background.", img: "/examples/academic.png" }
-            ].map((example, i) => (
-              <div key={i} className="group relative rounded-2xl bg-slate-900/40 border border-slate-800/60 overflow-hidden cursor-crosshair shadow-lg hover:shadow-indigo-500/10 transition-all duration-500">
-                <div className="aspect-[1/1.414] w-full overflow-hidden relative bg-slate-950">
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent z-10 opacity-80 group-hover:opacity-60 transition-opacity"></div>
-                  <div className="absolute inset-0 flex items-center justify-center p-6 text-center z-20">
-                     <p className="text-white font-bold text-sm tracking-tight opacity-40 group-hover:opacity-100 transition-opacity">{example.title}</p>
-                  </div>
-                </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {['Tech', 'Creative', 'Executive', 'Academic', 'Startup', 'Medical', 'Finance', 'Intern'].map((item) => (
+              <div key={item} className="aspect-[1/1.3] bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center p-4 group hover:border-indigo-500 transition-all cursor-crosshair">
+                <span className="text-[10px] font-black text-slate-700 uppercase group-hover:text-indigo-400">{item} Profile</span>
               </div>
             ))}
           </div>
@@ -204,7 +283,7 @@ function ResumeBuilderContent() {
 
 export default function Home() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-950 flex items-center justify-center text-white">Initializing AI Engine...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-slate-950 flex items-center justify-center text-white">Initializing Engine...</div>}>
       <ResumeBuilderContent />
     </Suspense>
   )
