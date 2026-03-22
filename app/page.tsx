@@ -211,7 +211,7 @@ function ResumeBuilderContent() {
       });
     } catch (error) {
       alert('Error: ' + error);
-    } finally { setIsUint32Array(false); setIsLoading(false); }
+    } finally { setIsLoading(false); }
   };
 
   return (
