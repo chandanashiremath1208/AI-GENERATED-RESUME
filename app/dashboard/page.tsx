@@ -1,23 +1,62 @@
-import { createClient } from '@/utils/supabase/server'
-import { redirect } from 'next/navigation'
-import Link from 'next/link'
-import { Sparkles, FileText, Plus, LogOut, ArrowRight, Clock } from 'lucide-react'
+'use client';
 
-export default async function DashboardPage() {
-  const supabase = await createClient()
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { Sparkles, FileText, Plus, LogOut, ArrowRight, Clock, Trash2, Eye } from 'lucide-react';
+import { createClient } from '@/utils/supabase/client';
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+export default function DashboardPage() {
+  const [resumes, setResumes] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const supabase = createClient();
 
-  // Auth check temporarily disabled for submission
+  useEffect(() => {
+    const getData = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        window.location.href = '/login';
+        return;
+      }
+      setUser(user);
 
-  const { data: resumes } = await supabase
-    .from('resumes')
-    .select('*')
-    // .eq('user_id', user?.id) // Disabled for public submission access
-    .order('created_at', { ascending: false })
-    .limit(20)
+      const { data } = await supabase
+        .from('resumes')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      
+      setResumes(data || []);
+      setLoading(false);
+    };
+    getData();
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this resume?')) return;
+
+    try {
+      const { error } = await supabase
+        .from('resumes')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      setResumes(resumes.filter(r => r.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert('Failed to delete resume');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400">
+        <Sparkles className="w-8 h-8 animate-spin mr-3 text-indigo-500" />
+        <span className="font-bold tracking-widest uppercase text-xs">Loading Dashboard...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen w-full flex flex-col bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500/30">
@@ -36,7 +75,7 @@ export default async function DashboardPage() {
           </Link>
         </div>
         <div className="flex items-center gap-4 text-sm font-medium">
-          <span className="text-slate-400 hidden sm:inline-block">Guest User</span>
+          <span className="text-slate-400 hidden sm:inline-block">{user?.email}</span>
           <form action="/auth/signout" method="post">
             <button className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 rounded-lg shadow-sm transition-all flex items-center gap-2 text-sm backdrop-blur-sm">
               <LogOut className="w-4 h-4" /> Sign Out
@@ -52,10 +91,10 @@ export default async function DashboardPage() {
 
         <div className="flex items-center justify-between mb-10 relative z-10">
           <div>
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 tracking-tight mb-2">
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 tracking-tight mb-2 uppercase">
               My Resumes
             </h1>
-            <p className="text-slate-400">View and manage your AI-generated resumes.</p>
+            <p className="text-slate-400">View and manage your AI-generated documents.</p>
           </div>
           <Link href="/">
             <button className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-xl shadow-[0_0_20px_-5px_rgba(99,102,241,0.4)] transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
@@ -67,12 +106,12 @@ export default async function DashboardPage() {
 
         {/* Resumes Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative z-10">
-          {!resumes || resumes.length === 0 ? (
+          {resumes.length === 0 ? (
             <div className="col-span-full py-20 flex flex-col items-center justify-center text-center bg-slate-900/30 border border-slate-800/50 rounded-2xl border-dashed">
               <div className="w-16 h-16 mb-4 rounded-full bg-slate-800 flex items-center justify-center text-slate-500">
                 <FileText className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold text-slate-200 mb-2">No resumes yet</h3>
+              <h3 className="text-xl font-bold text-slate-200 mb-2 font-mono">NO DATA FOUND</h3>
               <p className="text-slate-500 max-w-sm mb-6">
                 You haven't generated any resumes. Create your first ATS-optimized profile now.
               </p>
@@ -88,26 +127,37 @@ export default async function DashboardPage() {
               try {
                 parsed = JSON.parse(resume.content);
               } catch (e) {
-                parsed = { name: 'Unknown', role: 'Resume Document' };
+                parsed = { name: 'Resume', role: 'Professional Resume' };
               }
 
               return (
                 <div key={resume.id} className="relative group bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-2xl p-6 hover:border-indigo-500/50 transition-all hover:shadow-[0_0_30px_-10px_rgba(99,102,241,0.3)]">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700/50 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform shadow-xl">
                       <FileText className="w-6 h-6" />
                     </div>
+                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                       <button 
+                         onClick={() => handleDelete(resume.id)}
+                         className="p-2 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-lg transition-colors border border-slate-700 shadow-sm"
+                       >
+                         <Trash2 className="w-4 h-4" />
+                       </button>
+                    </div>
                   </div>
-                  <h3 className="text-lg font-bold text-white mb-1 truncate">{parsed.role || 'Professional Resume'}</h3>
-                  <p className="text-sm font-medium text-slate-400 mb-4">{parsed.name || 'Anonymous'}</p>
+                  <h3 className="text-lg font-bold text-white mb-1 truncate">{parsed.name}</h3>
+                  <p className="text-xs font-bold text-indigo-400/80 mb-4 uppercase tracking-widest truncate">{parsed.role}</p>
                   
-                  <div className="flex items-center gap-2 text-xs text-slate-500 pt-4 border-t border-slate-800">
-                    <Clock className="w-3.5 h-3.5" />
-                    {new Date(resume.created_at).toLocaleDateString(undefined, {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                    })}
+                  <div className="flex items-center justify-between pt-4 border-t border-slate-800">
+                    <div className="flex items-center gap-2 text-[10px] text-slate-500 font-bold uppercase tracking-tighter">
+                      <Clock className="w-3.5 h-3.5" />
+                      {new Date(resume.created_at).toLocaleDateString()}
+                    </div>
+                    <Link href={`/?resumeId=${resume.id}`}>
+                      <button className="flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-white transition-colors group/btn">
+                        Edit <Eye className="w-3.5 h-3.5 group-hover/btn:scale-110 transition-transform" />
+                      </button>
+                    </Link>
                   </div>
                 </div>
               )
@@ -116,5 +166,5 @@ export default async function DashboardPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }

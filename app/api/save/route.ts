@@ -14,15 +14,16 @@ export async function POST(req: Request) {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    // Prepare insert payload (if user exists, tie it to their account)
-    const payload: any = { content: content };
-    if (user) {
-      payload.user_id = user.id;
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized. Please sign in.' }, { status: 401 });
     }
 
     const { data, error } = await supabase
       .from('resumes')
-      .insert([payload])
+      .insert([{ 
+        content: content,
+        user_id: user.id 
+      }])
       .select();
 
     if (error) {

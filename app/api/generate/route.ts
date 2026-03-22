@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { createClient } from '@/utils/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,9 +14,16 @@ export async function POST(req: Request) {
     }
   });
 
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized. Please sign in.' }, { status: 401 });
+  }
+
   try {
     const body = await req.json();
-    const { name, email, phone, role, summary, experience, education, skills } = body;
+    const { name, email, phone, role, summary, experience, education, skills, template } = body;
 
     if (!process.env.OPENROUTER_API_KEY) {
       return NextResponse.json({ error: 'OpenRouter API key not configured.' }, { status: 500 });
@@ -36,10 +44,11 @@ export async function POST(req: Request) {
       Skills: ${skills}
       
       CRITICAL: You must answer ONLY with a valid, raw JSON object representing the generated resume. Do NOT wrap the JSON in markdown code blocks (like \`\`\`json). Do not add any conversational text.
-      Expand brief points into professional, impactful sentences. Do NOT invent fake jobs or degrees, but DO enhance the bullet points professionally.
+      The user has selected the "${template}" template style. Adjust the tone and complexity of the bullet points accordingly (e.g., more punchy/active for modern, more sophisticated for executive).
       
       The JSON object must EXACTLY follow this structure:
       {
+        "template": "${template}",
         "name": "Full Name",
         "role": "Target Role (uppercase)",
         "contact": [
