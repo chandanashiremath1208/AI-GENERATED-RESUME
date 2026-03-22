@@ -71,7 +71,7 @@ export default function ResumeForm({ onSubmit, isLoading, initialData }: { onSub
           <div className={`${cardClasses} animate-in fade-in duration-500`}>
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-indigo-600"></div>
             <h3 className="flex items-center gap-2 text-xl font-bold text-slate-100 mb-6 tracking-tight">
-              <User className="w-5 h-5 text-indigo-400" /> Core Profile
+              <User className="w-5 h-5 text-indigo-400" /> [v2.0] Core Profile
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
               <div>
