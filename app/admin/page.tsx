@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Sparkles, Users, FileText, ArrowLeft, ShieldAlert } from 'lucide-react'
 
 // FOR SCHOLARSHIP SUBMISSION: You can add your own email here to be the admin
-const ADMIN_EMAILS = ['admin@example.com', 'user@example.com'] // Example emails
+const ADMIN_EMAILS = ['admin@example.com', 'user@example.com', 'chandanashiremath@gmail.com'] // Example emails
 
 export default async function AdminDashboard() {
   const supabase = await createClient()

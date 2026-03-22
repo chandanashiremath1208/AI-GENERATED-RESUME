@@ -70,6 +70,36 @@ export default function ResumePreview({ content, template = 'modern' }: { conten
       headerStyle: "text-right mb-12 bg-slate-50 p-10 rounded-3xl border-r-8 border-emerald-500",
       sectionHeader: "text-2xl font-black text-emerald-600 mb-6 flex items-center gap-4 after:h-[2px] after:flex-1 after:bg-emerald-100",
       bulletStyle: "text-emerald-500"
+    },
+    minimal: {
+      container: "font-sans text-slate-700 max-w-[700px] mx-auto",
+      accentText: "text-slate-900",
+      accentBorder: "border-slate-200",
+      accentBg: "bg-slate-50",
+      fontFamily: "font-sans",
+      headerStyle: "text-center mb-16",
+      sectionHeader: "text-sm font-black uppercase tracking-[0.4em] text-slate-400 mb-8 flex justify-center",
+      bulletStyle: "text-slate-300"
+    },
+    startup: {
+      container: "font-sans text-slate-800",
+      accentText: "text-blue-600",
+      accentBorder: "border-blue-500",
+      accentBg: "bg-blue-50",
+      fontFamily: "font-sans",
+      headerStyle: "text-left mb-12 flex items-baseline gap-6 justify-between",
+      sectionHeader: "text-xl font-bold text-slate-900 mb-6 flex items-center gap-2 before:w-2 before:h-8 before:bg-blue-600",
+      bulletStyle: "text-blue-500"
+    },
+    academic: {
+      container: "font-serif text-slate-900 text-[13px] leading-tight",
+      accentText: "text-slate-900",
+      accentBorder: "border-slate-900",
+      accentBg: "bg-transparent",
+      fontFamily: "font-serif",
+      headerStyle: "text-center mb-10 border-b-2 border-slate-900 pb-6",
+      sectionHeader: "text-base font-bold uppercase border-b border-slate-900 mb-4",
+      bulletStyle: "text-slate-900"
     }
   };
 

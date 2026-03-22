@@ -135,7 +135,10 @@ export default function ResumeWizard({ onSubmit, isLoading, initialData }: { onS
               {[
                 { id: 'modern', name: 'Modern Minimal', desc: 'Tech-forward and clean.' },
                 { id: 'executive', name: 'Executive Silk', desc: 'Professional and serif.' },
-                { id: 'creative', name: 'Creative Edge', desc: 'Bold and dynamic.' }
+                { id: 'creative', name: 'Creative Edge', desc: 'Bold and dynamic.' },
+                { id: 'minimal', name: 'Ultra Minimal', desc: 'Pure whitespace focus.' },
+                { id: 'startup', name: 'Startup Bold', desc: 'High-energy tech vibe.' },
+                { id: 'academic', name: 'Academic Slate', desc: 'Formal and structured.' }
               ].map((t) => (
                 <div key={t.id} onClick={() => setTemplate(t.id)} className={`cursor-pointer p-4 rounded-xl border-2 transition-all ${formData.template === t.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-slate-800 bg-slate-900/40 hover:border-slate-700'}`}>
                   <h4 className="font-bold text-slate-100 text-xs mb-1 uppercase">{t.name}</h4>
