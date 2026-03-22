@@ -122,9 +122,21 @@ export default function ResumePreview({ content, template = 'modern' }: { conten
   };
 
   const handleDownload = () => {
-    setTimeout(() => {
-      window.print();
-    }, 100);
+    const element = document.getElementById('resume-pdf-container');
+    if (!element) return;
+
+    // Dynamically import to keep bundle size small if needed, but here we just use it
+    // @ts-ignore
+    import('html2pdf.js').then((html2pdf) => {
+      const opt = {
+        margin: 0,
+        filename: `${parsedResume?.name?.replace(/\s+/g, '_') || 'Resume'}_ElevateAI.pdf`,
+        image: { type: 'jpeg' as const, quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF: { unit: 'in', format: 'letter' as const, orientation: 'portrait' as const }
+      };
+      html2pdf.default().from(element).set(opt).save();
+    });
   };
 
   if (!content) return null;

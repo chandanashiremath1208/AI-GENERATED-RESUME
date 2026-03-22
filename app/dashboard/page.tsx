@@ -86,16 +86,30 @@ export default function DashboardPage() {
       setPreviewContent(data.resume);
       setPreviewTemplate(formData.template);
 
-      await fetch('/api/save', {
+      const saveResponse = await fetch('/api/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: data.resume, template: formData.template }),
+        body: JSON.stringify({ 
+          content: data.resume, 
+          template: formData.template,
+          title: formData.name || 'Synthetic Profile' 
+        }),
       });
 
+      if (!saveResponse.ok) {
+        const errorData = await saveResponse.json();
+        throw new Error(errorData.error || 'Failed to sync with library');
+      }
+
       await fetchResumes();
+      setShowWizard(false);
+      alert('SUCCESS: Resume Synchronized to Intelligence Library');
     } catch (error) {
-      alert('Error: ' + error);
-    } finally { setIsGenerating(false); }
+      console.error('Save Flow Error:', error);
+      alert('SYNC ERROR: ' + error);
+    } finally { 
+      setIsGenerating(false); 
+    }
   };
 
   if (loading) {
@@ -172,21 +186,22 @@ export default function DashboardPage() {
       ) : (
         <main className="flex-1 w-full max-w-7xl mx-auto p-6 sm:p-10 relative overflow-y-auto">
           <div className="flex flex-col sm:flex-row items-center justify-between mb-12 gap-6">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-black uppercase tracking-widest mb-4">
-                <LayoutGrid className="w-3 h-3" /> Central Dashboard
-              </div>
-              <h1 className="text-4xl sm:text-5xl font-black text-white mb-2 tracking-tighter uppercase leading-none italic">
-                My Intelligence Library
-              </h1>
-              <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Manage and evolve your professional narratives.</p>
+            <div className="flex flex-col mb-10 sm:mb-0">
+            <div className="px-3 py-1 w-fit bg-indigo-500/10 border border-indigo-500/20 rounded-full flex items-center gap-2 mb-4">
+              <Sparkles className="w-3 h-3 text-indigo-400" />
+              <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">{resumes.length} Intelligence Units Synthesized</span>
             </div>
-            <button 
-              onClick={handleCreateNew}
-              className="w-full sm:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-widest text-sm rounded-2xl shadow-2xl shadow-indigo-600/20 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3"
-            >
-              <Plus className="w-5 h-5" /> New Document
-            </button>
+            <h1 className="text-4xl sm:text-6xl font-black text-white italic tracking-tighter uppercase leading-none mb-2">
+              My Intelligence Library
+            </h1>
+            <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">Manage and evolve your professional narratives.</p>
+          </div>
+          <button 
+            onClick={handleCreateNew}
+            className="w-full sm:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-black uppercase tracking-widest text-sm rounded-2xl shadow-2xl shadow-indigo-600/20 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3"
+          >
+            <Plus className="w-5 h-5" /> New Document
+          </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -118,22 +118,25 @@ export default function Onboarding() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { name: "Modern Engineer", role: "Frontend Architecture" },
-            { name: "Creative Director", role: "Visual Brand Identity" },
-            { name: "Chief Executive", role: "Global Operations" },
-            { name: "Academic Researcher", role: "Ph.D. Computer Physics" },
-            { name: "Startup Founder", role: "Series A Tech Venture" },
-            { name: "Finance Analyst", role: "Quantitative Strategy" },
-            { name: "Medical Expert", role: "Neuroscience Residency" },
-            { name: "Entry-Level Intern", role: "Software Development" }
+            { name: "Modern Engineer", role: "Frontend Architecture", img: "/samples/modern.png" },
+            { name: "Creative Director", role: "Visual Brand Identity", img: "/samples/creative.png" },
+            { name: "Chief Executive", role: "Global Operations", img: "/samples/executive.png" },
+            { name: "Academic Researcher", role: "Ph.D. Computer Physics", img: "/samples/academic.png" },
+            { name: "Startup Founder", role: "Series A Tech Venture", img: "/samples/startup.png" },
+            { name: "Finance Analyst", role: "Quantitative Strategy", img: "/samples/finance.png" },
+            { name: "Medical Expert", role: "Neuroscience Residency", img: "/samples/medical.png" },
+            { name: "Entry-Level Intern", role: "Software Development", img: "/samples/intern.png" }
           ].map((item, i) => (
-            <div key={i} className="group aspect-[1/1.3] bg-slate-900/40 border border-slate-800/60 rounded-[2rem] p-8 flex flex-col items-center justify-center text-center transition-all hover:border-indigo-500/40 hover:bg-indigo-500/5 relative overflow-hidden backdrop-blur-sm shadow-2xl">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
-              <div className="w-14 h-14 bg-slate-800 rounded-2xl mb-6 flex items-center justify-center group-hover:bg-indigo-600 transition-all transform group-hover:scale-110 shadow-xl">
-                <Layout className="w-6 h-6 text-slate-500 group-hover:text-white" />
+            <div key={i} className="group aspect-[1/1.3] bg-slate-900/40 border border-slate-800/60 rounded-[2rem] overflow-hidden transition-all hover:border-indigo-500/40 hover:bg-indigo-500/5 relative backdrop-blur-sm shadow-2xl">
+              <img 
+                src={item.img} 
+                alt={item.name}
+                className="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent p-8 flex flex-col justify-end text-left translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                <h4 className="text-lg font-black text-white uppercase italic tracking-tighter mb-1">{item.name}</h4>
+                <p className="text-[10px] font-black text-indigo-400/70 uppercase tracking-[0.2em]">{item.role}</p>
               </div>
-              <h4 className="text-lg font-black text-white uppercase italic tracking-tighter mb-1">{item.name}</h4>
-              <p className="text-[10px] font-black text-indigo-400/70 uppercase tracking-[0.2em]">{item.role}</p>
             </div>
           ))}
         </div>
