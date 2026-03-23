@@ -84,33 +84,37 @@ export default function DashboardPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
-      if (!response.ok) throw new Error('Generation failed');
-      const data = await response.json();
-
-      setPreviewContent(data.resume);
+      
+      const genData = await response.json();
+      if (!response.ok) {
+        throw new Error(genData.error || 'AI Synthesis Failed - Check API Key/Credits');
+      }
+      
+      setPreviewContent(genData.resume);
       setPreviewTemplate(formData.template);
 
+      // Automatic Sync to Library
       const saveResponse = await fetch('/api/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          content: data.resume,
+          content: genData.resume,
           template: formData.template,
           title: formData.name || 'Synthetic Profile'
         }),
       });
 
+      const saveData = await saveResponse.json();
       if (!saveResponse.ok) {
-        const errorData = await saveResponse.json();
-        throw new Error(errorData.error || 'Failed to sync with library');
+        throw new Error(saveData.error || 'Failed to sync to database');
       }
 
       await fetchResumes();
       setShowWizard(false);
-      alert('SUCCESS: Resume Synchronized to Intelligence Library');
-    } catch (error) {
+      alert('SYNCHRONIZED: Your intelligence unit has been preserved in the library.');
+    } catch (error: any) {
       console.error('Save Flow Error:', error);
-      alert('SYNC ERROR: ' + error);
+      alert('SYNC ERROR: ' + error.message);
     } finally {
       setIsGenerating(false);
     }
