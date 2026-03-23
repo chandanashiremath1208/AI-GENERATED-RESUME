@@ -27,42 +27,48 @@ export async function POST(req: Request) {
 
     const models = [
       "google/gemini-2.0-flash-lite-preview-02-05:free",
-      "google/gemma-2-9b-it:free",
-      "mistralai/mistral-7b-instruct:free"
+      "google/gemini-2.0-pro-exp-02-05:free",
+      "qwen/qwen-2.5-72b-instruct:free",
+      "microsoft/phi-3-medium-128k-instruct:free",
+      "meta-llama/llama-3.1-8b-instruct:free",
+      "meta-llama/llama-3.3-70b-instruct:free"
     ];
 
-    let lastError = null;
+    let detailedErrors: string[] = [];
     let completion = null;
 
     for (const model of models) {
       try {
-        console.log(`Trying AI Model: ${model}`);
+        console.log(`Trying Omni-Node: ${model}`);
         completion = await openai.chat.completions.create({
           model,
           messages: [
-            { role: "system", content: "You are an expert resume parser and writer. You output strictly raw JSON matching the requested schema." },
-            { role: "user", content: `
-              You are an expert professional resume writer.
-              Take these inputs and create a highly professional, JSON-only resume.
-              User: { name: "${name}", role: "${role}", experience: "${experience}", education: "${education}", skills: "${skills}" }
-              Template: ${template}
-              
-              Return ONLY a JSON object matching this schema:
-              { "name": "", "role": "", "contact": [], "summary": "", "experience": [], "education": [], "skills": [] }
-            ` }
+            { role: "system", content: "You are an expert resume writer. Output ONLY raw JSON." },
+            { role: "user", content: `Create a professional resume JSON for ${name} (${role}). Experience: ${experience}. Education: ${education}. Template: ${template}. Return EXACT matching schema.` }
           ],
           temperature: 0.6,
+          max_tokens: 2000
         });
-        if (completion) break;
+        if (completion?.choices?.[0]?.message?.content) break;
       } catch (err: any) {
-        console.error(`Model ${model} failed:`, err.message);
-        lastError = err;
+        console.error(`Omni-Node ${model} failed:`, err.message);
+        detailedErrors.push(`${model}: ${err.message}`);
+        
+        // Critical: If it's a 401, stop immediately as the KEY is the issue
+        if (err.message.includes('401') || err.message.toLowerCase().includes('auth')) {
+          return NextResponse.json({ 
+            error: "CRITICAL: OpenRouter Authentication Failed. Please check your API Key in environment variables.",
+            details: detailedErrors
+          }, { status: 401 });
+        }
       }
     }
 
-    if (!completion) {
+    if (!completion || !completion.choices?.[0]?.message?.content) {
       return NextResponse.json({ 
-        error: `AI Synthesis Failed across all nodes. Last Error: ${lastError?.message || 'Unknown'}` 
+        error: "AI ECOSYSTEM OFFLINE: Failed across all 6 high-availability nodes.",
+        details: detailedErrors,
+        troubleshooting: "1. Check your OpenRouter credits. 2. Verify OPENROUTER_API_KEY in Vercel settings. 3. Try again in 60 seconds."
       }, { status: 500 });
     }
 
