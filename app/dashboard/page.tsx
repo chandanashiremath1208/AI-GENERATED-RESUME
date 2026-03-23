@@ -284,10 +284,10 @@ export default function DashboardPage() {
 
                   <div className="mb-8 relative z-10">
                     <h3 className="text-xl font-black text-white mb-2 uppercase italic truncate group-hover:text-indigo-300 transition-colors tracking-tight">
-                      {parsed.name}
+                      {typeof parsed.name === 'string' ? parsed.name : 'Synthetic Profile'}
                     </h3>
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] truncate leading-none">
-                      {parsed.role}
+                      {typeof parsed.role === 'string' ? parsed.role : 'System Operator'}
                     </p>
                   </div>
 

@@ -120,6 +120,44 @@ export default function ResumePreview({ content, template = 'modern' }: { conten
     }
   }
 
+  // ULTRA-SAFE SANITIZATION LAYER
+  if (isJson && parsedResume) {
+    const raw = parsedResume as any;
+    const s = (val: any, fallback: string = '') => typeof val === 'string' ? val : (val ? String(val) : fallback);
+    
+    parsedResume = {
+      name: s(raw.name, s(raw.personalInfo?.fullName, 'Synthetic Narrative')),
+      role: s(raw.role, s(raw.personalInfo?.role, 'System Operator')),
+      summary: s(raw.summary, ''),
+      contact: [],
+      experience: [],
+      education: [],
+      skills: []
+    };
+
+    const rawContact = Array.isArray(raw.contact) ? raw.contact : (Array.isArray(raw.personalInfo?.contact) ? raw.personalInfo.contact : []);
+    parsedResume.contact = rawContact.map((c: any) => ({
+      type: s(c?.type, 'link'),
+      value: s(c?.value, '')
+    }));
+
+    parsedResume.experience = Array.isArray(raw.experience) ? raw.experience.map((e: any) => ({
+      company: s(e?.company),
+      role: s(e?.role),
+      date: s(e?.date),
+      location: s(e?.location),
+      bullets: Array.isArray(e?.bullets) ? e.bullets.map((b:any) => s(b)) : []
+    })) : [];
+
+    parsedResume.education = Array.isArray(raw.education) ? raw.education.map((e: any) => ({
+      institution: s(e?.institution),
+      degree: s(e?.degree),
+      date: s(e?.date)
+    })) : [];
+
+    parsedResume.skills = Array.isArray(raw.skills) ? raw.skills.map((skill:any) => s(skill)) : [];
+  }
+
   const handleCopy = async () => {
     try {
       const textToCopy = typeof content === 'string' ? content : JSON.stringify(content, null, 2);
@@ -195,15 +233,15 @@ export default function ResumePreview({ content, template = 'modern' }: { conten
               {/* HEADER AREA */}
               <div className={theme.headerStyle}>
                 <h1 className="text-5xl sm:text-6xl font-black tracking-tight text-slate-900 mb-2 leading-none">
-                  {parsedResume.name || (parsedResume as any).personalInfo?.fullName || 'Synthetic Narrative'}
+                  {parsedResume.name}
                 </h1>
                 <h2 className={`text-base font-bold uppercase tracking-[0.3em] mb-8 ${theme.accentText}`}>
-                  {parsedResume.role || (parsedResume as any).personalInfo?.role || 'System Operator'}
+                  {parsedResume.role}
                 </h2>
                 
-                {Array.isArray(parsedResume.contact || (parsedResume as any).personalInfo?.contact) && (
+                {parsedResume.contact.length > 0 && (
                   <div className={`flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-slate-500 ${template === 'modern' ? 'justify-center' : template === 'creative' ? 'justify-end' : 'justify-start'}`}>
-                    {(parsedResume.contact || (parsedResume as any).personalInfo?.contact).map((c: any, i: number) => (
+                    {parsedResume.contact.map((c: any, i: number) => (
                       <div key={i} className="flex items-center gap-2.5 group">
                         <div className={`w-8 h-8 rounded-full ${theme.accentBg} flex items-center justify-center transition-colors`}>
                           {c.type.toLowerCase().includes('mail') ? <Mail className={`w-3.5 h-3.5 ${theme.accentText}`} /> : 
