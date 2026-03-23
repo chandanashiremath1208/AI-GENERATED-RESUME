@@ -87,7 +87,10 @@ export default function DashboardPage() {
       
       const genData = await response.json();
       if (!response.ok) {
-        throw new Error(genData.error || 'AI Synthesis Failed - Check API Key/Credits');
+        let msg = genData.error || 'AI Synthesis Failed';
+        if (genData.troubleshooting) msg += '\n\nTROUBLESHOOTING:\n' + genData.troubleshooting;
+        if (genData.details) msg += '\n\nNODE LOGS:\n' + genData.details.join('\n');
+        throw new Error(msg);
       }
       
       setPreviewContent(genData.resume);
@@ -113,7 +116,7 @@ export default function DashboardPage() {
       setShowWizard(false);
       alert('SYNCHRONIZED: Your intelligence unit has been preserved in the library.');
     } catch (error: any) {
-      console.error('Save Flow Error:', error);
+      console.error('Core Logic Failure:', error);
       alert('SYNC ERROR: ' + error.message);
     } finally {
       setIsGenerating(false);

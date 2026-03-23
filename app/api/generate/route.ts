@@ -61,6 +61,15 @@ export async function POST(req: Request) {
             details: detailedErrors
           }, { status: 401 });
         }
+
+        // Critical: If it's a 402, stop immediately as the QUOTA is empty
+        if (err.message.includes('402') || err.message.toLowerCase().includes('payment') || err.message.toLowerCase().includes('credit')) {
+          return NextResponse.json({ 
+            error: "QUOTA EXHAUSTED: Your OpenRouter account has 0 credits or has reached its free limit.",
+            details: detailedErrors,
+            troubleshooting: "1. Top up your OpenRouter credits. 2. Use a different API Key. 3. Check if your other project 'utube-summarizer' has a working key."
+          }, { status: 402 });
+        }
       }
     }
 
