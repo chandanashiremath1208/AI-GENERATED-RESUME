@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { 
   Sparkles, FileText, Briefcase, Zap, 
   Download, Loader2, User, Mail, Phone, 
-  GraduationCap, Wrench
+  GraduationCap, Wrench, Eye, X
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -19,12 +19,12 @@ export default function ResumeWizard({ onSubmit, isLoading, initialData }: { onS
     email: '',
     phone: '',
     role: '',
-    summary: '',
     experience: '',
     education: '',
     skills: '',
     template: 'modern'
   });
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialData) {
@@ -140,18 +140,32 @@ export default function ResumeWizard({ onSubmit, isLoading, initialData }: { onS
                 { id: 'startup', name: 'Startup Bold', desc: 'High-energy tech vibe.' },
                 { id: 'academic', name: 'Academic Slate', desc: 'Formal and structured.' }
               ].map((t) => (
-                <div key={t.id} onClick={() => setTemplate(t.id)} className={`cursor-pointer overflow-hidden border-2 transition-all rounded-2xl ${formData.template === t.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-slate-800 bg-slate-900/40 hover:border-slate-700'}`}>
-                  <div className="aspect-video w-full relative group">
-                    <img 
-                      src={`/samples/${t.id === 'minimal' ? 'modern' : t.id}.png`} 
+                <div
+                  key={t.id}
+                  className={`group cursor-pointer overflow-hidden border-2 transition-all rounded-2xl relative ${formData.template === t.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-slate-800 bg-slate-900/40 hover:border-slate-700'}`}
+                >
+                  <div className="aspect-video w-full relative" onClick={() => setTemplate(t.id)}>
+                    <img
+                      src={`/samples/${t.id === 'minimal' ? 'modern' : t.id}.png`}
                       alt={t.name}
                       className={`w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity ${formData.template === t.id ? 'opacity-100' : ''}`}
                     />
                     <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-slate-950 to-transparent">
                       <h4 className="font-bold text-white text-[10px] uppercase truncate">{t.name}</h4>
                     </div>
+
+                    {/* Quick Preview Button Overlay */}
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPreviewImage(`/samples/${t.id === 'minimal' ? 'modern' : t.id}.png`);
+                      }}
+                      className="absolute top-2 right-2 p-1.5 bg-black/60 rounded-full text-white/40 hover:text-white transition-colors opacity-0 group-hover:opacity-100 backdrop-blur-md"
+                    >
+                      <Eye className="w-3 h-3" />
+                    </button>
                   </div>
-                  <div className="p-3">
+                  <div className="p-3" onClick={() => setTemplate(t.id)}>
                     <p className="text-[10px] text-slate-500 leading-tight italic">{t.desc}</p>
                   </div>
                 </div>
@@ -170,6 +184,22 @@ export default function ResumeWizard({ onSubmit, isLoading, initialData }: { onS
           </Button>
         </div>
       </form>
+      {/* Full Preview Modal */}
+      {previewImage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-20 bg-slate-950/90 backdrop-blur-xl animate-in fade-in duration-300">
+           <button 
+             onClick={() => setPreviewImage(null)}
+             className="absolute top-10 right-10 p-4 rounded-full bg-white/10 text-white hover:bg-white/20 transition-all border border-white/10"
+           >
+             <X className="w-8 h-8" />
+           </button>
+           <img 
+             src={previewImage} 
+             alt="Template Preview" 
+             className="max-w-full max-h-full rounded-2xl shadow-2xl border border-white/10 object-contain"
+           />
+        </div>
+      )}
     </div>
   );
 }

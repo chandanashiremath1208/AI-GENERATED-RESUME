@@ -115,17 +115,22 @@ export default function ResumePreview({ content, template = 'modern' }: { conten
     isJson = false;
   }
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(content);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy content:', err);
+      alert('Failed to copy to clipboard. Please try manually selecting text.');
+    }
   };
 
   const handleDownload = () => {
     const element = document.getElementById('resume-pdf-container');
     if (!element) return;
 
-    // Dynamically import to keep bundle size small if needed, but here we just use it
+    // Dynamically import to keep bundle size small
     // @ts-ignore
     import('html2pdf.js').then((html2pdf) => {
       const opt = {
@@ -135,7 +140,19 @@ export default function ResumePreview({ content, template = 'modern' }: { conten
         html2canvas: { scale: 2, useCORS: true, letterRendering: true },
         jsPDF: { unit: 'in', format: 'letter' as const, orientation: 'portrait' as const }
       };
-      html2pdf.default().from(element).set(opt).save();
+      
+      try {
+        html2pdf.default().from(element).set(opt).save().then(() => {
+          console.log('PDF Download initiated');
+        }).catch((err: any) => {
+          alert('PDF Generation failed: ' + err.message);
+        });
+      } catch (err: any) {
+        alert('Internal error during PDF generation: ' + err.message);
+      }
+    }).catch(err => {
+      console.error('Failed to load html2pdf.js:', err);
+      alert('Failed to load PDF engine. Please check your internet connection.');
     });
   };
 

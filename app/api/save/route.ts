@@ -46,7 +46,9 @@ export async function POST(req: Request) {
 
     if (error) {
       console.error('Final Supabase Error:', error);
-      return NextResponse.json({ error: 'Critical: Failed to save to database. Check table schema.' }, { status: 500 });
+      return NextResponse.json({ 
+        error: `Critical: Database Error - ${error.message} (${error.code}). Check if table 'resumes' exists and RLS allows inserts.` 
+      }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, data });

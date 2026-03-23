@@ -1,8 +1,12 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
-import Link from 'next/link';
-import { Sparkles, FileText, Plus, LogOut, ArrowRight, Clock, Trash2, Eye, LayoutGrid, ArrowLeft } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { 
+  Sparkles, FileText, Plus, LogOut, ArrowRight, 
+  Clock, Trash2, Eye, LayoutGrid, ArrowLeft,
+  Briefcase, Zap, Download, Loader2, User, 
+  Mail, Phone, GraduationCap, Wrench, X
+} from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 import ResumeWizard from '@/components/ResumeWizard';
 import ResumePreview from '@/components/ResumePreview';
@@ -32,7 +36,7 @@ export default function DashboardPage() {
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
-    
+
     setResumes(data || []);
     setLoading(false);
   };
@@ -82,17 +86,17 @@ export default function DashboardPage() {
       });
       if (!response.ok) throw new Error('Generation failed');
       const data = await response.json();
-      
+
       setPreviewContent(data.resume);
       setPreviewTemplate(formData.template);
 
       const saveResponse = await fetch('/api/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          content: data.resume, 
+        body: JSON.stringify({
+          content: data.resume,
           template: formData.template,
-          title: formData.name || 'Synthetic Profile' 
+          title: formData.name || 'Synthetic Profile'
         }),
       });
 
@@ -107,8 +111,8 @@ export default function DashboardPage() {
     } catch (error) {
       console.error('Save Flow Error:', error);
       alert('SYNC ERROR: ' + error);
-    } finally { 
-      setIsGenerating(false); 
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -125,23 +129,32 @@ export default function DashboardPage() {
     <div className="min-h-screen w-full flex flex-col bg-slate-950 text-slate-100 font-sans selection:bg-indigo-500/30">
       {/* Top Navigation Bar */}
       <nav className="h-16 w-full bg-slate-950/80 backdrop-blur-md border-b border-slate-800 px-6 flex items-center justify-between shrink-0 z-30 sticky top-0">
-        <div className="flex items-center gap-3">
-            <div className="flex items-center gap-3 cursor-pointer" onClick={() => setShowWizard(false)}>
-              <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                <Sparkles className="w-4 h-4 text-white" />
-              </div>
-              <span className="font-bold text-xl tracking-tight text-slate-100 uppercase">
-                Elevate <span className="text-indigo-400">AI</span>
-              </span>
-            </div>
-        </div>
-        <div className="flex items-center gap-4 text-sm font-black uppercase tracking-widest text-[10px]">
-          <span className="text-slate-500 hidden sm:inline-block">{user?.email}</span>
-          <form action="/auth/signout" method="post">
-            <button className="px-4 py-2 bg-slate-900 border border-slate-800 hover:border-red-500/50 text-slate-400 hover:text-red-400 rounded-lg transition-all flex items-center gap-2">
-              <LogOut className="w-3.5 h-3.5" /> Sign Out
+        {/* Global Branding & User Info */}
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-4">
+             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.3)]">
+               <Zap className="w-6 h-6 text-white" />
+             </div>
+             <div>
+               <h1 className="text-xl font-black text-white tracking-tighter uppercase">Elevate <span className="text-indigo-500">AI</span></h1>
+               <div className="flex items-center gap-2">
+                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                 <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{resumes.length} Units Synthesized</span>
+               </div>
+             </div>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <span className="hidden sm:block text-[10px] font-black text-slate-500 uppercase tracking-widest bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-700/50">
+              {user?.email}
+            </span>
+            <button
+              onClick={() => supabase.auth.signOut()}
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition-all border border-slate-700 flex items-center gap-2"
+            >
+              Sign Out
             </button>
-          </form>
+          </div>
         </div>
       </nav>
 
