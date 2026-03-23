@@ -27,7 +27,7 @@ interface ResumeData {
   skills: string[];
 }
 
-export default function ResumePreview({ content, template = 'modern' }: { content: string, template?: string }) {
+export default function ResumePreview({ content, template = 'modern' }: { content: any, template?: string }) {
   const [copied, setCopied] = useState(false);
 
   // Theme-Specific Design Tokens
@@ -108,16 +108,22 @@ export default function ResumePreview({ content, template = 'modern' }: { conten
   let parsedResume: ResumeData | null = null;
   let isJson = false;
 
-  try {
-    parsedResume = JSON.parse(content);
+  if (content && typeof content === 'object') {
+    parsedResume = content as ResumeData;
     isJson = true;
-  } catch (e) {
-    isJson = false;
+  } else if (typeof content === 'string') {
+    try {
+      parsedResume = JSON.parse(content);
+      isJson = true;
+    } catch (e) {
+      isJson = false;
+    }
   }
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(content);
+      const textToCopy = typeof content === 'string' ? content : JSON.stringify(content, null, 2);
+      await navigator.clipboard.writeText(textToCopy);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -188,12 +194,16 @@ export default function ResumePreview({ content, template = 'modern' }: { conten
               
               {/* HEADER AREA */}
               <div className={theme.headerStyle}>
-                <h1 className="text-5xl sm:text-6xl font-black tracking-tight text-slate-900 mb-2 leading-none">{parsedResume.name}</h1>
-                <h2 className={`text-base font-bold uppercase tracking-[0.3em] mb-8 ${theme.accentText}`}>{parsedResume.role}</h2>
+                <h1 className="text-5xl sm:text-6xl font-black tracking-tight text-slate-900 mb-2 leading-none">
+                  {parsedResume.name || (parsedResume as any).personalInfo?.fullName || 'Synthetic Narrative'}
+                </h1>
+                <h2 className={`text-base font-bold uppercase tracking-[0.3em] mb-8 ${theme.accentText}`}>
+                  {parsedResume.role || (parsedResume as any).personalInfo?.role || 'System Operator'}
+                </h2>
                 
-                {Array.isArray(parsedResume.contact) && (
+                {Array.isArray(parsedResume.contact || (parsedResume as any).personalInfo?.contact) && (
                   <div className={`flex flex-wrap items-center gap-x-8 gap-y-3 text-sm text-slate-500 ${template === 'modern' ? 'justify-center' : template === 'creative' ? 'justify-end' : 'justify-start'}`}>
-                    {parsedResume.contact.map((c, i) => (
+                    {(parsedResume.contact || (parsedResume as any).personalInfo?.contact).map((c: any, i: number) => (
                       <div key={i} className="flex items-center gap-2.5 group">
                         <div className={`w-8 h-8 rounded-full ${theme.accentBg} flex items-center justify-center transition-colors`}>
                           {c.type.toLowerCase().includes('mail') ? <Mail className={`w-3.5 h-3.5 ${theme.accentText}`} /> : 
@@ -288,7 +298,7 @@ export default function ResumePreview({ content, template = 'modern' }: { conten
             </div>
           ) : (
             <div className="prose prose-slate prose-lg !max-w-none text-slate-700 print:prose-p:text-sm print:prose-li:text-sm">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{content}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{typeof content === 'string' ? content : 'Synthesized Narrative In Flight...'}</ReactMarkdown>
             </div>
           )}
         </div>

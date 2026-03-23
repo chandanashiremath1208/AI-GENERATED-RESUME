@@ -28,7 +28,31 @@ export default function ResumeWizard({ onSubmit, isLoading, initialData }: { onS
 
   useEffect(() => {
     if (initialData) {
-      setFormData(prev => ({ ...prev, ...initialData }));
+      // Robust mapping from generated resume object back to flat form fields
+      const personalInfo = initialData.personalInfo || {};
+      const expStr = Array.isArray(initialData.experience) 
+        ? initialData.experience.map((e: any) => `${e.company}: ${e.role} (${e.date})\n${Array.isArray(e.bullets) ? e.bullets.join('\n') : ''}`).join('\n\n')
+        : initialData.experience || '';
+      
+      const eduStr = Array.isArray(initialData.education)
+        ? initialData.education.map((e: any) => `${e.institution}, ${e.degree} (${e.date})`).join('\n')
+        : initialData.education || '';
+
+      const skillsStr = Array.isArray(initialData.skills)
+        ? initialData.skills.join(', ')
+        : initialData.skills || '';
+
+      setFormData(prev => ({
+        ...prev,
+        name: initialData.name || personalInfo.fullName || prev.name,
+        email: initialData.email || personalInfo.email || prev.email,
+        phone: initialData.phone || personalInfo.phone || prev.phone,
+        role: initialData.role || personalInfo.role || prev.role,
+        experience: expStr || prev.experience,
+        education: eduStr || prev.education,
+        skills: skillsStr || prev.skills,
+        template: initialData.template || prev.template
+      }));
     }
   }, [initialData]);
 

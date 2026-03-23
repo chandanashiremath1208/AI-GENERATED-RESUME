@@ -70,8 +70,14 @@ export default function DashboardPage() {
   };
 
   const handleEdit = (resume: any) => {
-    setEditingResume(JSON.parse(resume.content));
-    setPreviewContent(resume.content);
+    let contentObj;
+    try {
+      contentObj = typeof resume.content === 'string' ? JSON.parse(resume.content) : resume.content;
+    } catch (e) {
+      contentObj = { personalInfo: { fullName: 'Legacy', email: '' } };
+    }
+    setEditingResume(contentObj);
+    setPreviewContent(contentObj);
     setPreviewTemplate(resume.template || 'modern');
     setShowWizard(true);
   };
