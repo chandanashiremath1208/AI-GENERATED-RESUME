@@ -5,6 +5,16 @@ import { createClient } from '@/utils/supabase/server';
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  const keyPrefix = apiKey ? apiKey.substring(0, 10) : 'MISSING';
+
+  if (!apiKey || apiKey === 'your_anon_key_here') {
+    return NextResponse.json({ 
+      error: 'CRITICAL: OpenRouter API Key is missing or default in Vercel settings.',
+      troubleshooting: 'Please go to Vercel Dashboard -> Settings -> Environment Variables and ensure OPENROUTER_API_KEY is properly set.'
+    }, { status: 500 });
+  }
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -14,14 +24,14 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const { name, email, phone, role, summary, experience, education, skills, template } = body;
+    const { name, role, experience, education, skills, template } = body;
 
     const openai = new OpenAI({
       baseURL: "https://openrouter.ai/api/v1",
-      apiKey: process.env.OPENROUTER_API_KEY,
+      apiKey: apiKey,
       defaultHeaders: {
         "HTTP-Referer": req.headers.get('origin') || 'https://ai-generated-resume-rho.vercel.app/',
-        "X-Title": 'AI Resume Builder (Elevate)',
+        "X-Title": 'AI Resume Builder (Elevate AI)',
       }
     });
 
@@ -39,45 +49,36 @@ export async function POST(req: Request) {
 
     for (const model of models) {
       try {
-        console.log(`Trying Omni-Node: ${model}`);
+        console.log(`Trying AI Node: ${model}`);
         completion = await openai.chat.completions.create({
           model,
           messages: [
-            { role: "system", content: "You are an expert resume writer. Output ONLY raw JSON." },
-            { role: "user", content: `Create a professional resume JSON for ${name} (${role}). Experience: ${experience}. Education: ${education}. Template: ${template}. Return EXACT matching schema.` }
+            { role: "system", content: "You are an expert resume writer. Output ONLY raw JSON matching the requested schema." },
+            { role: "user", content: `Create a professional resume JSON for ${name} (${role}). Experience: ${experience}. Education: ${education}. Template style: ${template}. Return EXACT schema: { "name": "", "role": "", "contact": [], "summary": "", "experience": [], "education": [], "skills": [] }` }
           ],
           temperature: 0.6,
           max_tokens: 2000
         });
         if (completion?.choices?.[0]?.message?.content) break;
       } catch (err: any) {
-        console.error(`Omni-Node ${model} failed:`, err.message);
         detailedErrors.push(`${model}: ${err.message}`);
         
-        // Critical: If it's a 401, stop immediately as the KEY is the issue
-        if (err.message.includes('401') || err.message.toLowerCase().includes('auth')) {
+        // Immediate Auth Check
+        if (err.message.includes('401') || err.message.toLowerCase().includes('auth') || err.message.toLowerCase().includes('invalid api key')) {
           return NextResponse.json({ 
-            error: "CRITICAL: OpenRouter Authentication Failed. Please check your API Key in environment variables.",
+            error: `AUTHENTICATION FAILED: The Key starting with "${keyPrefix}..." was rejected by OpenRouter.`,
+            troubleshooting: '1. Copy the key sk-or-v1-525...d22 from your dashboard. 2. Update it in Vercel Settings -> Environment Variables.',
             details: detailedErrors
           }, { status: 401 });
-        }
-
-        // Critical: If it's a 402, stop immediately as the QUOTA is empty
-        if (err.message.includes('402') || err.message.toLowerCase().includes('payment') || err.message.toLowerCase().includes('credit')) {
-          return NextResponse.json({ 
-            error: "QUOTA EXHAUSTED: Your OpenRouter account has 0 credits or has reached its free limit.",
-            details: detailedErrors,
-            troubleshooting: "1. Top up your OpenRouter credits. 2. Use a different API Key. 3. Check if your other project 'utube-summarizer' has a working key."
-          }, { status: 402 });
         }
       }
     }
 
     if (!completion || !completion.choices?.[0]?.message?.content) {
       return NextResponse.json({ 
-        error: "AI ECOSYSTEM OFFLINE: Failed across all 6 high-availability nodes.",
+        error: `AI CLUSTER OFFLINE (Active Key: ${keyPrefix}...)`,
         details: detailedErrors,
-        troubleshooting: "1. Check your OpenRouter credits. 2. Verify OPENROUTER_API_KEY in Vercel settings. 3. Try again in 60 seconds."
+        troubleshooting: "Current OpenRouter key is either out of credits or inactive. Please swap to the working key from your other project."
       }, { status: 500 });
     }
 
