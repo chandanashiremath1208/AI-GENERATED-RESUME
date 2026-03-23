@@ -81,7 +81,7 @@ export async function POST(req: Request) {
     `;
 
     const completion = await openai.chat.completions.create({
-      model: "openrouter/free",
+      model: "google/gemini-2.0-flash-lite-preview-02-05:free", // Verified free model
       messages: [
         { role: "system", content: "You are an expert resume parser and writer. You output strictly raw JSON matching the requested schema." },
         { role: "user", content: prompt }
