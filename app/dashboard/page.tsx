@@ -237,54 +237,59 @@ export default function DashboardPage() {
                 </button>
               </div>
             ) : (
-              resumes.map((resume) => {
-                let parsed;
-                try {
-                  parsed = JSON.parse(resume.content);
-                } catch (e) {
-                  parsed = { name: 'Legacy Document', role: 'System Narrative' };
-                }
+            resumes.map((resume) => {
+              let parsed;
+              try {
+                parsed = typeof resume.content === 'string' ? JSON.parse(resume.content) : resume.content;
+              } catch (e) {
+                parsed = { name: 'Synthetic Document', role: 'Archived Narrative' };
+              }
 
-                return (
-                  <div 
-                    key={resume.id} 
-                    onClick={() => handleEdit(resume)}
-                    className="group bg-slate-900/50 border border-slate-800 rounded-3xl p-8 hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all cursor-pointer relative overflow-hidden"
-                  >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    
-                    <div className="flex items-start justify-between mb-8 relative z-10">
-                      <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center group-hover:bg-indigo-600 transition-colors shadow-2xl">
-                        <FileText className="w-7 h-7 text-slate-500 group-hover:text-white" />
-                      </div>
-                      <button 
-                        onClick={(e) => handleDelete(e, resume.id)}
-                        className="p-3 bg-slate-800/50 hover:bg-red-500/10 text-slate-600 hover:text-red-400 rounded-xl transition-all border border-transparent hover:border-red-500/20"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+              // Final rendering guards
+              const displayName = parsed?.name || resume.title || 'Untitled Unit';
+              const displayRole = parsed?.role || 'System Operator';
+              const displayDate = resume.created_at ? new Date(resume.created_at).toLocaleDateString() : 'Active';
+
+              return (
+                <div 
+                  key={resume.id} 
+                  onClick={() => handleEdit(resume)}
+                  className="group bg-slate-900/50 border border-slate-800 rounded-3xl p-8 hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all cursor-pointer relative overflow-hidden"
+                >
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  
+                  <div className="flex items-start justify-between mb-8 relative z-10">
+                    <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center group-hover:bg-indigo-600 transition-colors shadow-2xl">
+                      <FileText className="w-7 h-7 text-slate-500 group-hover:text-white" />
                     </div>
+                    <button 
+                      onClick={(e) => handleDelete(e, resume.id)}
+                      className="p-3 bg-slate-800/50 hover:bg-red-500/10 text-slate-600 hover:text-red-400 rounded-xl transition-all border border-transparent hover:border-red-500/20"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
 
-                    <div className="mb-8 relative z-10">
-                      <h3 className="text-xl font-black text-white mb-2 uppercase italic truncate group-hover:text-indigo-300 transition-colors tracking-tight">
-                        {parsed.name}
-                      </h3>
-                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] truncate leading-none">
-                        {parsed.role}
-                      </p>
+                  <div className="mb-8 relative z-10">
+                    <h3 className="text-xl font-black text-white mb-2 uppercase italic truncate group-hover:text-indigo-300 transition-colors tracking-tight">
+                      {displayName}
+                    </h3>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] truncate leading-none">
+                      {displayRole}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-6 border-t border-slate-800 relative z-10">
+                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-600">
+                      <Clock className="w-3 h-3" /> {displayDate}
                     </div>
-
-                    <div className="flex items-center justify-between pt-6 border-t border-slate-800 relative z-10">
-                      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-600">
-                        <Clock className="w-3 h-3" /> {new Date(resume.created_at).toLocaleDateString()}
-                      </div>
-                      <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-indigo-400">
-                        Evolve <Eye className="w-3 h-3" />
-                      </div>
+                    <div className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-indigo-400">
+                      Evolve <Eye className="w-3 h-3" />
                     </div>
                   </div>
-                )
-              })
+                </div>
+              );
+            })
             )}
           </div>
         </main>
