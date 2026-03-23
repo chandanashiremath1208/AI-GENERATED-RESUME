@@ -244,17 +244,23 @@ export default function DashboardPage() {
               </div>
             ) : (
             resumes.map((resume) => {
-              let parsed;
+              // Ultra-safe data normalization
+              let parsed = { name: 'Untitled Narrative', role: 'Archived Unit' };
               try {
-                parsed = typeof resume.content === 'string' ? JSON.parse(resume.content) : resume.content;
+                if (resume.content) {
+                  const content = typeof resume.content === 'string' ? JSON.parse(resume.content) : resume.content;
+                  if (content && typeof content === 'object') {
+                    parsed = {
+                      name: content.name || content.personalInfo?.fullName || resume.title || 'Synthetic Document',
+                      role: content.role || content.personalInfo?.role || 'System Operator'
+                    };
+                  }
+                }
               } catch (e) {
-                parsed = { name: 'Synthetic Document', role: 'Archived Narrative' };
+                console.error("Data Normalization Logic Failure:", e);
               }
 
-              // Final rendering guards
-              const displayName = parsed?.name || resume.title || 'Untitled Unit';
-              const displayRole = parsed?.role || 'System Operator';
-              const displayDate = resume.created_at ? new Date(resume.created_at).toLocaleDateString() : 'Active';
+              const displayDate = resume.created_at ? new Date(resume.created_at).toDateString() : 'Active';
 
               return (
                 <div 
@@ -278,10 +284,10 @@ export default function DashboardPage() {
 
                   <div className="mb-8 relative z-10">
                     <h3 className="text-xl font-black text-white mb-2 uppercase italic truncate group-hover:text-indigo-300 transition-colors tracking-tight">
-                      {displayName}
+                      {parsed.name}
                     </h3>
                     <p className="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] truncate leading-none">
-                      {displayRole}
+                      {parsed.role}
                     </p>
                   </div>
 
