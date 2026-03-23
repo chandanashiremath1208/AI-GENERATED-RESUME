@@ -36,12 +36,11 @@ export async function POST(req: Request) {
     });
 
     const models = [
-      "google/gemini-2.0-flash-lite-preview-02-05:free",
-      "google/gemini-2.0-pro-exp-02-05:free",
-      "qwen/qwen-2.5-72b-instruct:free",
-      "microsoft/phi-3-medium-128k-instruct:free",
-      "meta-llama/llama-3.1-8b-instruct:free",
-      "meta-llama/llama-3.3-70b-instruct:free"
+      "google/gemma-3-27b-it:free",
+      "qwen/qwen3-next-80b-a3b-instruct:free",
+      "nousresearch/hermes-3-llama-3.1-405b:free",
+      "nvidia/nemotron-3-super-120b-a12b:free",
+      "stepfun/step-3.5-flash:free"
     ];
 
     let detailedErrors: string[] = [];
